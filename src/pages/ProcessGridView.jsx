@@ -91,17 +91,17 @@ const ProcessGridView = () => {
 
   return (
     <div>
-      <header className="mb-10">
-        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+      <header className="mb-6 sm:mb-10">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-2 sm:mb-4">
           Predictive <span className="text-purple-600">Process Grid</span>
         </h1>
-        <p className="text-slate-600 max-w-3xl">
+        <p className="text-sm sm:text-base text-slate-600 max-w-3xl">
           The PMBOK 6th Edition framework. Click any process to explore its Inputs, Tools & Techniques, and Outputs (ITTOs).
         </p>
       </header>
 
-      <div className="overflow-x-auto pb-8">
-        <div className="min-w-[1200px] bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="overflow-x-auto pb-4 sm:pb-8 -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="min-w-[900px] sm:min-w-[1200px] bg-white rounded-lg sm:rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           {/* Header Row */}
           <div className="grid grid-cols-[200px_repeat(5,1fr)] bg-slate-800 text-white font-bold text-sm uppercase tracking-wider">
             <div className="p-4 border-r border-slate-700 flex items-center justify-center bg-white text-slate-900 border-b border-slate-200">
@@ -160,34 +160,34 @@ const ProcessGridView = () => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white w-full max-w-4xl max-h-[85vh] rounded-2xl shadow-2xl relative z-10 flex flex-col overflow-hidden"
+              className="bg-white w-full max-w-4xl max-h-[90vh] rounded-xl sm:rounded-2xl shadow-2xl relative z-10 flex flex-col overflow-hidden"
             >
               {/* Modal Header */}
-              <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <div>
-                  <h2 className="text-2xl font-bold text-slate-900">{selectedProcess.title}</h2>
-                  <p className="text-slate-500 text-sm mt-1">Process Details & ITTOs</p>
+              <div className="p-4 sm:p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50 shrink-0">
+                <div className="pr-10">
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">{selectedProcess.title}</h2>
+                  <p className="text-slate-500 text-xs sm:text-sm mt-1">Process Details & ITTOs</p>
                 </div>
-                <button 
+                <button
                   onClick={() => setSelectedProcess(null)}
-                  className="p-2 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors"
+                  className="p-2 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors absolute top-4 right-4 sm:static"
                 >
-                  <X size={24} />
+                  <X size={22} />
                 </button>
               </div>
 
               {/* Modal Body */}
-              <div className="p-6 overflow-y-auto custom-scrollbar">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="p-4 sm:p-6 overflow-y-auto custom-scrollbar">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {/* Inputs */}
-                  <div className="bg-blue-50 rounded-xl border border-blue-100 overflow-hidden">
-                    <div className="bg-blue-100/50 p-4 border-b border-blue-100 flex items-center gap-2">
-                      <Database size={18} className="text-blue-600" />
-                      <h3 className="font-bold text-blue-800">Inputs</h3>
+                  <div className="bg-blue-50 rounded-lg sm:rounded-xl border border-blue-100 overflow-hidden">
+                    <div className="bg-blue-100/50 p-3 sm:p-4 border-b border-blue-100 flex items-center gap-2">
+                      <Database size={16} className="sm:w-[18px] sm:h-[18px] text-blue-600" />
+                      <h3 className="font-bold text-sm sm:text-base text-blue-800">Inputs</h3>
                     </div>
-                    <ul className="p-4 space-y-3">
+                    <ul className="p-3 sm:p-4 space-y-2 sm:space-y-3">
                       {selectedProcess.inputs.map((item, i) => (
-                        <li key={i} className="text-sm text-slate-700 flex items-start gap-2">
+                        <li key={i} className="text-xs sm:text-sm text-slate-700 flex items-start gap-2">
                           <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0"></span>
                           {item}
                         </li>
@@ -196,14 +196,14 @@ const ProcessGridView = () => {
                   </div>
 
                   {/* Tools */}
-                  <div className="bg-purple-50 rounded-xl border border-purple-100 overflow-hidden">
-                    <div className="bg-purple-100/50 p-4 border-b border-purple-100 flex items-center gap-2">
-                      <Settings size={18} className="text-purple-600" />
-                      <h3 className="font-bold text-purple-800">Tools & Techniques</h3>
+                  <div className="bg-purple-50 rounded-lg sm:rounded-xl border border-purple-100 overflow-hidden">
+                    <div className="bg-purple-100/50 p-3 sm:p-4 border-b border-purple-100 flex items-center gap-2">
+                      <Settings size={16} className="sm:w-[18px] sm:h-[18px] text-purple-600" />
+                      <h3 className="font-bold text-sm sm:text-base text-purple-800">Tools & Techniques</h3>
                     </div>
-                    <ul className="p-4 space-y-3">
+                    <ul className="p-3 sm:p-4 space-y-2 sm:space-y-3">
                       {selectedProcess.tools.map((item, i) => (
-                        <li key={i} className="text-sm text-slate-700 flex items-start gap-2">
+                        <li key={i} className="text-xs sm:text-sm text-slate-700 flex items-start gap-2">
                           <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-purple-400 shrink-0"></span>
                           {item}
                         </li>
@@ -212,14 +212,14 @@ const ProcessGridView = () => {
                   </div>
 
                   {/* Outputs */}
-                  <div className="bg-green-50 rounded-xl border border-green-100 overflow-hidden">
-                    <div className="bg-green-100/50 p-4 border-b border-green-100 flex items-center gap-2">
-                      <FileText size={18} className="text-green-600" />
-                      <h3 className="font-bold text-green-800">Outputs</h3>
+                  <div className="bg-green-50 rounded-lg sm:rounded-xl border border-green-100 overflow-hidden sm:col-span-2 lg:col-span-1">
+                    <div className="bg-green-100/50 p-3 sm:p-4 border-b border-green-100 flex items-center gap-2">
+                      <FileText size={16} className="sm:w-[18px] sm:h-[18px] text-green-600" />
+                      <h3 className="font-bold text-sm sm:text-base text-green-800">Outputs</h3>
                     </div>
-                    <ul className="p-4 space-y-3">
+                    <ul className="p-3 sm:p-4 space-y-2 sm:space-y-3">
                       {selectedProcess.outputs.map((item, i) => (
-                        <li key={i} className="text-sm text-slate-700 flex items-start gap-2">
+                        <li key={i} className="text-xs sm:text-sm text-slate-700 flex items-start gap-2">
                           <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-green-400 shrink-0"></span>
                           {item}
                         </li>
