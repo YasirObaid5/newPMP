@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Unified Project Framework</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #e5e7eb; }
+        ::-webkit-scrollbar-thumb { background: #4f46e5; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4338ca; }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            height: 100vh;
+        }
+        
+        @media (max-width: 768px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            #main-sidebar {
+                position: fixed;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 40;
+                height: 100%;
+                width: 280px;
+            }
+            #main-sidebar.active {
+                transform: translateX(0);
+            }
+            #mobile-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 30;
+            }
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            color: #d1d5db;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .sidebar-link:hover {
+            background-color: #3730a3;
+            color: white;
+        }
+        .sidebar-link.active {
+            background-color: #eef2ff;
+            color: #312e81;
+            font-weight: 600;
+        }
+        .sidebar-link svg {
+            margin-right: 0.75rem;
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .content-panel {
+            display: none;
+        }
+        .content-panel.active {
+            display: block;
+        }
+
+        .process-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr 1fr 1fr 1fr;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .grid-cell, .grid-header-col, .grid-header-row {
+            padding: 1rem;
+            border-right: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+            min-height: 100px;
+        }
+        .process-grid > div:nth-child(6n) { border-right: none; }
+        .process-grid > div:nth-child(n+61) { border-bottom: none; }
+        .grid-header-col {
+            background-color: #374151;
+            color: white;
+            font-weight: 700;
+            text-align: center;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+        .grid-header-row {
+            background-color: #f3f4f6;
+            color: #1f2937;
+            font-weight: 600;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .grid-cell { font-size: 0.875rem; }
+        .grid-cell:empty { background-color: #f9fafb; }
+        .process-chip {
+            display: inline-block;
+            background-color: #eef2ff;
+            color: #4338ca;
+            border: 1px solid #c7d2fe;
+            padding: 0.375rem 0.75rem;
+            margin: 0.25rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .process-chip:hover {
+            background-color: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-backdrop {
+            position: fixed; inset: 0; background-color: rgba(17, 24, 39, 0.6);
+            backdrop-filter: blur(8px); z-index: 40; display: flex;
+            align-items: center; justify-content: center; opacity: 0;
+            transition: opacity 0.3s ease; pointer-events: none;
+        }
+        .modal-backdrop.active { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background-color: white; border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 90%; max-width: 900px; max-height: 85vh;
+            display: flex; flex-direction: column; transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-backdrop.active .modal-content { transform: scale(1); }
+        .modal-header {
+            padding: 1.5rem; border-bottom: 1px solid #e5e7eb;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title { font-size: 1.25rem; font-weight: 700; color: #312e81; }
+        .modal-close-btn {
+            background: none; border: none; color: #6b7280;
+            font-size: 1.5rem; cursor: pointer; line-height: 1;
+        }
+        .modal-body {
+            padding: 1.5rem; overflow-y: auto; display: grid;
+            grid-template-columns: repeat(1, 1fr); gap: 1.5rem;
+        }
+        @media (min-width: 768px) { .modal-body { grid-template-columns: repeat(3, 1fr); } }
+        .itto-section { background-color: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; }
+        .itto-title { font-size: 1rem; font-weight: 600; padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb; }
+        .itto-list { padding: 1rem; list-style-type: none; font-size: 0.875rem; color: #4b5563; }
+        .itto-list li { position: relative; padding-left: 1.25rem; margin-bottom: 0.5rem; }
+        .itto-list li::before {
+            content: '•'; position: absolute; left: 0; top: 0;
+            color: #4f46e5; font-weight: 700;
+        }
+        #modal-inputs-title { background-color: #dbeafe; color: #1e40af; }
+        #modal-tools-title { background-color: #d1fae5; color: #065f46; }
+        #modal-outputs-title { background-color: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="main-layout">
+        <aside id="main-sidebar" class="bg-gray-900 text-white p-6 flex flex-col space-y-4 overflow-y-auto">
+            <div class="flex items-center space-x-3 mb-6">
+                <svg class="w-10 h-10 text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+                </svg>
+                <div>
+                    <h1 class="text-xl font-bold text-white">Unified PM</h1>
+                    <p class="text-sm text-gray-400">Framework Dashboard</p>
+                </div>
+            </div>
+
+            <nav class="flex-grow">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="#welcome" class="sidebar-link active">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+                            Welcome
+                        </a>
+                    </li>
+                    
+                    <li class="pt-4 mt-4 border-t border-gray-700">
+                        <span class="text-xs font-semibold text-gray-500 uppercase px-4">Frameworks</span>
+                    </li>
+
+                    <li>
+                        <a href="#pm7" class="sidebar-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z" /></svg>
+                            PMBOK 7 (Value)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#agile" class="sidebar-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.023 9.348 4.992 4.993a.75.75 0 0 1-.002 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06L19.19 14.25H4.992a.75.75 0 0 1 0-1.5h14.198l-3.23-3.23a.75.75 0 0 1 1.06-1.06Z" /></svg>
+                            Agile (Adaptive)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#pm6" class="sidebar-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z" /></svg>
+                            PMBOK 6 (Predictive)
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main id="main-content" class="overflow-y-auto">
+            
+            <header class="md:hidden sticky top-0 bg-white p-4 flex justify-between items-center z-20 shadow-sm">
+                <h1 class="text-xl font-bold text-gray-800">Unified PM</h1>
+                <button id="mobile-menu-btn" class="text-gray-700 p-2">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
+            </header>
+            
+            <div id="mobile-overlay" class="hidden md:hidden"></div>
+
+            <section id="content-welcome" class="content-panel active p-6 md:p-10">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">The Unified Project Framework</h1>
+                <p class="text-lg text-gray-600 max-w-3xl mb-8">
+                    Welcome! This dashboard combines the three core pillars of modern project management. Use the sidebar to explore each framework.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <a href="#pm7" class="nav-card bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-indigo-200">
+                        <h2 class="text-xl font-semibold text-indigo-800 mb-2">PMBOK 7 (Value)</h2>
+                        <p class="text-gray-600">The "why" and "what." Explore the 12 Principles and 8 Performance Domains that define the value-driven core of all projects.</p>
+                    </a>
+                    <a href="#agile" class="nav-card bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-green-200">
+                        <h2 class="text-xl font-semibold text-green-800 mb-2">Agile (Adaptive)</h2>
+                        <p class="text-gray-600">The "adaptive" mindset. Learn the 4 Values and 12 Principles of Agile, plus common practices like Scrum and Kanban for iterative delivery.</p>
+                    </a>
+                    <a href="#pm6" class="nav-card bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-2">PMBOK 6 (Predictive)</h2>
+                        <p class="text-gray-600">The "predictive" process. Use the interactive grid of 10 Knowledge Areas and 5 Process Groups to see the ITTOs for a structured project.</p>
+                    </a>
+                </div>
+            </section>
+
+            <section id="content-pm7" class="content-panel p-6 md:p-10">
+                <h1 class="text-3xl font-bold text-gray-900 mb-6">PMBOK 7: The Value Framework</h1>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1">
+                        <h2 class="text-2xl font-semibold text-indigo-800 mb-4">The 12 Principles (The "Why")</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-sm space-y-3">
+                            <p class="text-sm text-gray-500">These are the guiding behaviors and mindsets for *all* project management.</p>
+                            <ul class="list-disc list-outside pl-5 space-y-2 text-gray-700 font-medium">
+                                <li>Be a diligent, respectful, and caring steward</li>
+                                <li>Create a collaborative project team environment</li>
+                                <li>Effectively engage with stakeholders</li>
+                                <li>Focus on value</li>
+                                <li>Recognize, evaluate, and respond to system interactions</li>
+                                <li>Demonstrate leadership behaviors</li>
+                                <li>Tailor based on context</li>
+                                <li>Build quality into processes and deliverables</li>
+                                <li>Navigate complexity</li>
+                                <li>Optimize risk responses</li>
+                                <li>Embrace adaptability and resiliency</li>
+                                <li>Enable change to achieve the envisioned future state</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <h2 class="text-2xl font-semibold text-indigo-800 mb-4">The 8 Performance Domains (The "What")</h2>
+                        <p class="text-gray-600 mb-4">These are the broad areas of activity that drive value delivery.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-white p-5 rounded-lg shadow-sm">
+                                <h3 class="font-semibold text-indigo-700">1. Stakeholders</h3>
+                                <p class="text-sm text-gray-600">Working with stakeholders to maintain alignment and foster positive relationships.</p>
+                            </div>
+                            <div class="bg-white p-5 rounded-lg shadow-sm">
+                                <h3 class="font-semibold text-indigo-700">2. Team</h3>
+                                <p class="text-sm text-gray-600">Building a culture of accountability and respect that enables high performance.</p>
+                            </div>
+                            <div class="bg-white p-5 rounded-lg shadow-sm">
+                                <h3 class="font-semibold text-indigo-700">3. Development Approach & Life Cycle</h3>
+                                <p class="text-sm text-gray-600">Selecting the right approach (predictive, adaptive, hybrid) and delivery cadence.</p>
+                            </div>
+                            <div class="bg-white p-5 rounded-lg shadow-sm">
+                                <h3 class="font-semibold text-indigo-700">4. Planning</h3>
+                                <p class="text-sm text-gray-600">Organizing and coordinating the work needed to deliver the project's outcomes.</p>
+                            </div>
+                            <div class="bg-white p-5 rounded-lg shadow-sm">
+                                <h3 class="font-semibold text-indigo-700">5. Project Work</h3>
+                                <p class="text-sm text-gray-600">Managing project processes, resources, and learning to get the work done efficiently.</p>
+                            </div>
+                            <div class="bg-white p-5 rounded-lg shadow-sm">
+                                <h3 class="font-semibold text-indigo-700">6. Delivery</h3>
+                                <p class="text-sm text-gray-600">Delivering the project's scope and quality to meet objectives and realize value.</p>
+                            </div>
+                            <div class="bg-white p-5 rounded-lg shadow-sm">
+                                <h3 class="font-semibold text-indigo-700">7. Measurement</h3>
+                                <p class="text-sm text-gray-600">Assessing project performance and taking action to maintain acceptable progress.</p>
+                            </div>
+                            <div class="bg-white p-5 rounded-lg shadow-sm">
+                                <h3 class="font-semibold text-indigo-700">8. Uncertainty</h3>
+                                <p class="text-sm text-gray-600">Navigating risk, ambiguity, and complexity in the project.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="content-agile" class="content-panel p-6 md:p-10">
+                <h1 class="text-3xl font-bold text-gray-900 mb-6">Agile: The Adaptive Framework</h1>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <h2 class="text-2xl font-semibold text-green-800 mb-4">The 4 Agile Values</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-sm space-y-4">
+                            <div class="border-b pb-4">
+                                <h3 class="text-lg font-semibold text-gray-800">Individuals and interactions</h3>
+                                <p class="text-gray-600">over processes and tools</p>
+                            </div>
+                            <div class="border-b pb-4">
+                                <h3 class="text-lg font-semibold text-gray-800">Working software</h3>
+                                <p class="text-gray-600">over comprehensive documentation</p>
+                            </div>
+                            <div class="border-b pb-4">
+                                <h3 class="text-lg font-semibold text-gray-800">Customer collaboration</h3>
+                                <p class="text-gray-600">over contract negotiation</p>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">Responding to change</h3>
+                                <p class="text-gray-600">over following a plan</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-semibold text-green-800 mb-4">The 12 Agile Principles</h2>
+                        <div class="bg-white p-6 rounded-lg shadow-sm">
+                            <ol class="list-decimal list-outside pl-5 space-y-2 text-gray-700">
+                                <li>Our highest priority is to satisfy the customer through early and continuous delivery of valuable software.</li>
+                                <li>Welcome changing requirements, even late in development.</li>
+                                <li>Deliver working software frequently, from a couple of weeks to a couple of months.</li>
+                                <li>Business people and developers must work together daily.</li>
+                                <li>Build projects around motivated individuals. Give them the environment and support they need.</li>
+                                <li>The most efficient and effective method of conveying information is face-to-face conversation.</li>
+                                <li>Working software is the primary measure of progress.</li>
+                                <li>Agile processes promote sustainable development.</li>
+                                <li>Continuous attention to technical excellence and good design enhances agility.</li>
+                                <li>Simplicity—the art of maximizing the amount of work not done—is essential.</li>
+                                <li>The best architectures, requirements, and designs emerge from self-organizing teams.</li>
+                                <li>At regular intervals, the team reflects on how to become more effective, then tunes and adjusts its behavior.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <h2 class="text-2xl font-semibold text-gray-800 mt-10 mb-4">Common Practices</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-semibold text-blue-800 mb-3">Scrum (Iterative)</h3>
+                        <p class="text-gray-600 mb-4">A framework for working in fixed-length iterations called **Sprints** to deliver a potentially shippable increment of product.</p>
+                        <ul class="list-disc list-outside pl-5 space-y-1 text-sm text-gray-700">
+                            <li>**Roles:** Product Owner, Scrum Master, Developers</li>
+                            <li>**Events:** Sprint, Sprint Planning, Daily Scrum, Sprint Review, Sprint Retrospective</li>
+                            <li>**Artifacts:** Product Backlog, Sprint Backlog, Product Increment</li>
+                            <li>**Best for:** Complex projects with changing requirements where incremental delivery adds value.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-semibold text-purple-800 mb-3">Kanban (Flow-Based)</h3>
+                        <p class="text-gray-600 mb-4">A method for visualizing and managing workflow. The goal is to optimize the flow of value from "To Do" to "Done."</p>
+                        <ul class="list-disc list-outside pl-5 space-y-1 text-sm text-gray-700">
+                            <li>**Core Principles:** Visualize the workflow, Limit Work in Progress (WIP), Manage flow, Make policies explicit</li>
+                            <li>**Key Feature:** A "Kanban Board" with columns representing stages of work.</li>
+                            <li>**Metrics:** Cycle Time, Throughput</li>
+                            <li>**Best for:** Work with a continuous flow, like support teams, ops, or projects where priorities change daily.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="content-pm6" class="content-panel p-6 md:p-10">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">PMBOK 6: The Predictive Process Grid</h1>
+                <p class="text-md text-gray-600 mb-6">
+                    This is an interactive tool for the PMBOK 6th Edition. Click any process to see its Inputs, Tools & Techniques, and Outputs (ITTOs).
+                </p>
+                <div class="overflow-x-auto">
+                    <div class="process-grid min-w-[1200px]">
+                        <div class="grid-header-col !bg-white !border-b !border-r !border-gray-200"></div>
+                        <div class="grid-header-col">1. Initiating</div>
+                        <div class="grid-header-col">2. Planning</div>
+                        <div class="grid-header-col">3. Executing</div>
+                        <div class="grid-header-col">4. Monitoring & Controlling</div>
+                        <div class="grid-header-col">5. Closing</div>
+        
+                        <div class="grid-header-row">4.1 Integration</div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="developProjectCharter">4.1 Develop Project Charter</span></div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="developProjectManagementPlan">4.2 Develop Project Management Plan</span></div>
+                        <div class="grid-cell">
+                            <span class="process-chip" data-process-key="directAndManageProjectWork">4.3 Direct and Manage Project Work</span>
+                            <span class="process-chip" data-process-key="manageProjectKnowledge">4.4 Manage Project Knowledge</span>
+                        </div>
+                        <div class="grid-cell">
+                            <span class="process-chip" data-process-key="monitorAndControlProjectWork">4.5 Monitor and Control Project Work</span>
+                            <span class="process-chip" data-process-key="performIntegratedChangeControl">4.6 Perform Integrated Change Control</span>
+                        </div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="closeProjectOrPhase">4.7 Close Project or Phase</span></div>
+        
+                        <div class="grid-header-row">4.2 Scope</div>
+                        <div class="grid-cell"></div>
+                        <div class="grid-cell">
+                            <span class="process-chip" data-process-key="planScopeManagement">5.1 Plan Scope Management</span>
+                            <span class="process-chip" data-process-key="collectRequirements">5.2 Collect Requirements</span>
+                            <span class="process-chip" data-process-key="defineScope">5.3 Define Scope</span>
+                            <span class="process-chip" data-process-key="createWBS">5.4 Create WBS</span>
+                        </div>
+                        <div class="grid-cell"></div>
+                        <div class="grid-cell">
+                            <span class="process-chip" data-process-key="validateScope">5.5 Validate Scope</span>
+                            <span class="process-chip" data-process-key="controlScope">5.6 Control Scope</span>
+                        </div>
+                        <div class="grid-cell"></div>
+                        
+                        <div class="grid-header-row">4.3 Schedule</div>
+                        <div class="grid-cell"></div>
+                        <div class="grid-cell">
+                            <span class="process-chip" data-process-key="planScheduleManagement">6.1 Plan Schedule Management</span>
+                            <span class="process-chip" data-process-key="defineActivities">6.2 Define Activities</span>
+                            <span class="process-chip" data-process-key="sequenceActivities">6.3 Sequence Activities</span>
+                            <span class="process-chip" data-process-key="estimateActivityDurations">6.4 Estimate Activity Durations</span>
+                            <span class="process-chip" data-process-key="developSchedule">6.5 Develop Schedule</span>
+                        </div>
+                        <div class="grid-cell"></div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="controlSchedule">6.6 Control Schedule</span></div>
+                        <div class="grid-cell"></div>
+        
+                        <div class="grid-header-row">4.4 Cost</div>
+                        <div class="grid-cell"></div>
+                        <div class="grid-cell">
+                            <span class="process-chip" data-process-key="planCostManagement">7.1 Plan Cost Management</span>
+                            <span class="process-chip" data-process-key="estimateCosts">7.2 Estimate Costs</span>
+                            <span class="process-chip" data-process-key="determineBudget">7.3 Determine Budget</span>
+                        </div>
+                        <div class="grid-cell"></div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="controlCost">7.4 Control Cost</span></div>
+                        <div class="grid-cell"></div>
+        
+                        <div class="grid-header-row">4.5 Quality</div>
+                        <div class="grid-cell"></div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="planQualityManagement">8.1 Plan Quality Management</span></div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="manageQuality">8.2 Manage Quality</span></div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="controlQuality">8.3 Control Quality</span></div>
+                        <div class="grid-cell"></div>
+        
+                        <div class="grid-header-row">4.6 Resource</div>
+                        <div class="grid-cell"></div>
+                        <div class="grid-cell">
+                            <span class="process-chip" data-process-key="planResourceManagement">9.1 Plan Resource Management</span>
+                            <span class="process-chip" data-process-key="estimateActivityResources">9.2 Estimate Activity Resources</span>
+                        </div>
+                        <div class="grid-cell">
+                            <span class="process-chip" data-process-key="acquireResources">9.3 Acquire Resources</span>
+                            <span class="process-chip" data-process-key="developTeam">9.4 Develop Team</span>
+                            <span class="process-chip" data-process-key="manageTeam">9.5 Manage Team</span>
+                        </div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="controlResources">9.6 Control Resources</span></div>
+                        <div class="grid-cell"></div>
+        
+                        <div class="grid-header-row">4.7 Communications</div>
+                        <div class="grid-cell"></div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="planCommunicationsManagement">10.1 Plan Communications Management</span></div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="manageCommunications">10.2 Manage Communications</span></div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="monitorCommunications">10.3 Monitor Communications</span></div>
+                        <div class="grid-cell"></div>
+        
+                        <div class="grid-header-row">4.8 Risk</div>
+                        <div class="grid-cell"></div>
+                        <div class="grid-cell">
+                            <span class="process-chip" data-process-key="planRiskManagement">11.1 Plan Risk Management</span>
+                            <span class="process-chip" data-process-key="identifyRisks">11.2 Identify Risks</span>
+                            <span class="process-chip" data-process-key="performQualitativeRiskAnalysis">11.3 Perform Qualitative Risk Analysis</span>
+                            <span class="process-chip" data-process-key="performQuantitativeRiskAnalysis">11.4 Perform Quantitative Risk Analysis</span>
+                            <span class="process-chip" data-process-key="planRiskResponses">11.5 Plan Risk Responses</span>
+                        </div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="implementRiskResponses">11.6 Implement Risk Responses</span></div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="monitorRisks">11.7 Monitor Risks</span></div>
+                        <div class="grid-cell"></div>
+                        
+                        <div class="grid-header-row">4.9 Procurement</div>
+                        <div class="grid-cell"></div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="planProcurementManagement">12.1 Plan Procurement Management</span></div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="conductProcurements">12.2 Conduct Procurements</span></div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="controlProcurements">12.3 Control Procurements</span></div>
+                        <div class="grid-cell"></div>
+        
+                        <div class="grid-header-row">4.10 Stakeholder</div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="identifyStakeholders">13.1 Identify Stakeholders</span></div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="planStakeholderEngagement">13.2 Plan Stakeholder Engagement</span></div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="manageStakeholderEngagement">13.3 Manage Stakeholder Engagement</span></div>
+                        <div class="grid-cell"><span class="process-chip" data-process-key="monitorStakeholderEngagement">13.4 Monitor Stakeholder Engagement</span></div>
+                        <div class="grid-cell"></div>
+                    </div>
+                </div>
+            </section>
+            
+        </main>
+    </div>
+
+    <div id="process-modal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title" class="modal-title">Process Name</h3>
+                <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="itto-section">
+                    <h4 id="modal-inputs-title" class="itto-title">Inputs</h4>
+                    <ul id="modal-inputs" class="itto-list"></ul>
+                </div>
+                <div class="itto-section">
+                    <h4 id="modal-tools-title" class="itto-title">Tools & Techniques</h4>
+                    <ul id="modal-tools" class="itto-list"></ul>
+                </div>
+                <div class="itto-section">
+                    <h4 id="modal-outputs-title" class="itto-title">Outputs</h4>
+                    <ul id="modal-outputs" class="itto-list"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const pmbok6Data = {
+            "planProcurementManagement": {
+                title: "12.1 Plan Procurement Management",
+                inputs: ["Project charter", "Business documents (Business case)", "Project management plan (Scope management plan, Quality management plan, Resource management plan, Scope baseline)", "Project documents (Milestone list, Project team assignments, Requirements documentation, Risk register, Stakeholder register)", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data gathering (Market research)", "Data analysis (Make-or-buy analysis)", "Source selection analysis", "Meetings"],
+                outputs: ["Procurement management plan", "Procurement strategy", "Bid documents", "Procurement statement of work (SOW)", "Source selection criteria", "Make-or-buy decisions", "Independent cost estimates (ICE)", "Change requests", "Project documents updates", "OPA updates"]
+            },
+            "conductProcurements": {
+                title: "12.2 Conduct Procurements",
+                inputs: ["Project management plan (Communications management plan, Procurement management plan, Cost baseline)", "Project documents (Lessons learned register, Risk register, Stakeholder register)", "Procurement documentation (Bid documents, Procurement SOW, etc.)", "Seller proposals", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Advertising", "Bidder conferences", "Data analysis (Proposal evaluation)", "Interpersonal and team skills (Negotiation)"],
+                outputs: ["Selected sellers", "Agreements", "Change requests", "Project management plan updates", "Project documents updates", "OPA updates"]
+            },
+            "controlProcurements": {
+                title: "12.3 Control Procurements",
+                inputs: ["Project management plan (Procurement management plan, Requirements management plan, Risk management plan, Change management plan, Schedule baseline)", "Project documents (Assumption log, Lessons learned register, Risk register, Stakeholder register)", "Agreements", "Procurement documentation", "Approved change requests", "Work performance data", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Claims administration", "Data analysis (Performance reviews, Trend analysis, Earned value analysis, Variance analysis)", "Inspection", "Audits"],
+                outputs: ["Closed procurements", "Work performance information", "Procurement documentation updates", "Change requests", "Project management plan updates", "Project documents updates", "OPA updates"]
+            },
+            "identifyStakeholders": {
+                title: "13.1 Identify Stakeholders",
+                inputs: ["Project charter", "Business documents (Business case)", "Project management plan", "Project documents (Change log, Issue log, Requirements documentation)", "Agreements", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data gathering (Questionnaires, Brainstorming)", "Data analysis (Stakeholder analysis, Document analysis)", "Data representation (Stakeholder mapping)", "Meetings"],
+                outputs: ["Stakeholder register", "Change requests", "Project management plan updates", "Project documents updates"]
+            },
+            "planStakeholderEngagement": {
+                title: "13.2 Plan Stakeholder Engagement",
+                inputs: ["Project charter", "Project management plan (Communications management plan, Risk management plan)", "Project documents (Assumption log, Change log, Issue log, Project schedule, Risk register, Stakeholder register)", "Agreements", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data gathering (Benchmarking)", "Data analysis (Assumption and constraint analysis, Root cause analysis)", "Decision making (Prioritization)", "Data representation (Mind mapping, Stakeholder engagement assessment matrix)", "Meetings"],
+                outputs: ["Stakeholder engagement plan"]
+            },
+            "manageStakeholderEngagement": {
+                title: "13.3 Manage Stakeholder Engagement",
+                inputs: ["Project management plan (Communications management plan, Stakeholder engagement plan)", "Project documents (Change log, Issue log, Lessons learned register, Stakeholder register)", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Communication skills (Feedback)", "Interpersonal and team skills (Conflict management, Cultural awareness, Negotiation, Observation, Political awareness)", "Ground rules", "Meetings"],
+                outputs: ["Change requests", "Project management plan updates", "Project documents updates"]
+            },
+            "monitorStakeholderEngagement": {
+                title: "13.4 Monitor Stakeholder Engagement",
+                inputs: ["Project management plan (Resource management plan, Communications management plan, Stakeholder engagement plan)", "Project documents (Issue log, Lessons learned register, Project communications, Risk register, Stakeholder register)", "Work performance data", "EEFs", "OPAs"],
+                tools: ["Data analysis (Alternatives analysis, Root cause analysis, Stakeholder analysis)", "Decision making (Multicriteria, Voting)", "Data representation (Stakeholder engagement assessment matrix)", "Communication skills (Feedback)", "Interpersonal and team skills (Active listening, Cultural awareness, Leadership, Networking, Political awareness)", "Meetings"],
+                outputs: ["Work performance information", "Change requests", "Project management plan updates", "Project documents updates"]
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            const navCards = document.querySelectorAll('.nav-card');
+            const contentPanels = document.querySelectorAll('.content-panel');
+            const sidebar = document.getElementById('main-sidebar');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileOverlay = document.getElementById('mobile-overlay');
+
+            function switchPanel(hash) {
+                const targetId = 'content-' + hash.substring(1);
+
+                contentPanels.forEach(panel => {
+                    panel.classList.remove('active');
+                });
+                
+                const targetPanel = document.getElementById(targetId);
+                if (targetPanel) {
+                    targetPanel.classList.add('active');
+                } else {
+                    document.getElementById('content-welcome').classList.add('active');
+                }
+
+                sidebarLinks.forEach(link => {
+                    if (link.getAttribute('href') === hash) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+                
+                if (window.innerWidth < 768) {
+                    sidebar.classList.remove('active');
+                    mobileOverlay.classList.add('hidden');
+                }
+                document.getElementById('main-content').scrollTo(0, 0);
+            }
+
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const hash = e.currentTarget.getAttribute('href');
+                    window.location.hash = hash;
+                    switchPanel(hash);
+                });
+            });
+
+            navCards.forEach(card => {
+                card.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const hash = e.currentTarget.getAttribute('href');
+                    window.location.hash = hash;
+                    switchPanel(hash);
+                });
+            });
+
+            function toggleMobileMenu() {
+                sidebar.classList.toggle('active');
+                mobileOverlay.classList.toggle('hidden');
+            }
+            mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+            mobileOverlay.addEventListener('click', toggleMobileMenu);
+
+            const pm6Grid = document.getElementById('content-pm6');
+            const modal = document.getElementById('process-modal');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+            const modalTitle = document.getElementById('modal-title');
+            const modalInputs = document.getElementById('modal-inputs');
+            const modalTools = document.getElementById('modal-tools');
+            const modalOutputs = document.getElementById('modal-outputs');
+
+            const openModal = (processKey) => {
+                const data = pmbok6Data[processKey];
+                if (!data) return;
+                
+                modalTitle.textContent = data.title;
+                modalInputs.innerHTML = data.inputs.map(item => `<li>${item}</li>`).join('');
+                modalTools.innerHTML = data.tools.map(item => `<li>${item}</li>`).join('');
+                modalOutputs.innerHTML = data.outputs.map(item => `<li>${item}</li>`).join('');
+                
+                modal.classList.add('active');
+            };
+
+            const closeModal = () => {
+                modal.classList.remove('active');
+            };
+
+            pm6Grid.addEventListener('click', (e) => {
+                if (e.target.classList.contains('process-chip')) {
+                    const key = e.target.getAttribute('data-process-key');
+                    openModal(key);
+                }
+            });
+
+            modalCloseBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            const currentHash = window.location.hash || '#welcome';
+            switchPanel(currentHash);
+        });
+    </script>
+
+</body>
+</html>developProjectCharter": {
+                title: "4.1 Develop Project Charter",
+                inputs: ["Business documents (Business case, Benefits management plan)", "Agreements", "Enterprise Environmental Factors (EEFs)", "Organizational Process Assets (OPAs)"],
+                tools: ["Expert judgment", "Data gathering (Brainstorming, Focus groups, Interviews)", "Interpersonal and team skills (Conflict management, Facilitation, Meeting management)", "Meetings"],
+                outputs: ["Project charter", "Assumption log"]
+            },
+            "developProjectManagementPlan": {
+                title: "4.2 Develop Project Management Plan",
+                inputs: ["Project charter", "Outputs from other processes", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data gathering (Brainstorming, Checklists, Focus groups, Interviews)", "Interpersonal and team skills (Conflict management, Facilitation, Meeting management)", "Meetings", "Change control tools", "PMIS"],
+                outputs: ["Project management plan"]
+            },
+            "directAndManageProjectWork": {
+                title: "4.3 Direct and Manage Project Work",
+                inputs: ["Project management plan", "Project documents (Change log, Lessons learned register, Milestone list, etc.)", "Approved change requests", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Project Management Information System (PMIS)", "Meetings"],
+                outputs: ["Deliverables", "Work performance data", "Issue log", "Change requests", "Project management plan updates", "Project documents updates", "OPA updates"]
+            },
+            "manageProjectKnowledge": {
+                title: "4.4 Manage Project Knowledge",
+                inputs: ["Project management plan", "Project documents (Lessons learned register, Resource breakdown structure, etc.)", "Deliverables", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Knowledge management", "Information management", "Interpersonal and team skills (Active listening, Facilitation, Leadership, etc.)"],
+                outputs: ["Lessons learned register", "Project management plan updates", "OPA updates"]
+            },
+            "monitorAndControlProjectWork": {
+                title: "4.5 Monitor and Control Project Work",
+                inputs: ["Project management plan", "Project documents (Assumption log, Cost forecasts, Issue log, Risk register, etc.)", "Work performance information", "Agreements", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data analysis (Alternatives analysis, Cost-benefit analysis, Trend analysis, etc.)", "Decision making", "Meetings"],
+                outputs: ["Work performance reports", "Change requests", "Project management plan updates", "Project documents updates"]
+            },
+            "performIntegratedChangeControl": {
+                title: "4.6 Perform Integrated Change Control",
+                inputs: ["Project management plan", "Project documents (Change log, Risk report, etc.)", "Work performance reports", "Change requests", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Change control tools", "Data analysis (Alternatives analysis, Cost-benefit analysis)", "Decision making (Voting, Autocratic, Multicriteria)", "Meetings"],
+                outputs: ["Approved change requests", "Project management plan updates", "Project documents updates (Change log)"]
+            },
+            "closeProjectOrPhase": {
+                title: "4.7 Close Project or Phase",
+                inputs: ["Project charter", "Project management plan", "Project documents (Assumption log, Lessons learned register, etc.)", "Accepted deliverables", "Business documents", "Agreements", "Procurement documentation", "OPAs"],
+                tools: ["Expert judgment", "Data analysis (Regression analysis, Trend analysis)", "Meetings"],
+                outputs: ["Final product, service, or result transition", "Final report", "Project documents updates (Lessons learned register)", "OPA updates"]
+            },
+            "planScopeManagement": {
+                title: "5.1 Plan Scope Management",
+                inputs: ["Project charter", "Project management plan", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data analysis (Alternatives analysis)", "Meetings"],
+                outputs: ["Scope management plan", "Requirements management plan"]
+            },
+            "collectRequirements": {
+                title: "5.2 Collect Requirements",
+                inputs: ["Project charter", "Project management plan", "Project documents (Assumption log, Stakeholder register, etc.)", "Business documents (Business case)", "Agreements", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data gathering (Brainstorming, Interviews, Focus groups, Questionnaires, Benchmarking)", "Data analysis (Document analysis)", "Decision making (Voting, Multicriteria)", "Data representation (Affinity diagrams, Mind mapping)", "Interpersonal and team skills (Nominal group technique, Observation, Facilitation)", "Context diagram", "Prototypes"],
+                outputs: ["Requirements documentation", "Requirements traceability matrix"]
+            },
+            "defineScope": {
+                title: "5.3 Define Scope",
+                inputs: ["Project charter", "Project management plan (Scope management plan)", "Project documents (Requirements documentation, Risk register, etc.)", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data analysis (Alternatives analysis)", "Decision making (Multicriteria)", "Interpersonal and team skills (Facilitation)", "Product analysis"],
+                outputs: ["Project scope statement", "Project documents updates"]
+            },
+            "createWBS": {
+                title: "5.4 Create WBS",
+                inputs: ["Project management plan (Scope management plan)", "Project documents (Project scope statement, Requirements documentation)", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Decomposition", "Meetings"],
+                outputs: ["Scope baseline", "Project documents updates"]
+            },
+            "validateScope": {
+                title: "5.5 Validate Scope",
+                inputs: ["Project management plan", "Project documents (Lessons learned register, Quality reports, Requirements documentation, etc.)", "Verified deliverables", "Work performance data"],
+                tools: ["Inspection", "Decision making (Voting)"],
+                outputs: ["Accepted deliverables", "Work performance information", "Change requests", "Project documents updates"]
+            },
+            "controlScope": {
+                title: "5.6 Control Scope",
+                inputs: ["Project management plan (Scope management plan, Scope baseline)", "Project documents (Lessons learned register, Requirements documentation, etc.)", "Work performance data", "OPAs"],
+                tools: ["Data analysis (Variance analysis, Trend analysis)"],
+                outputs: ["Work performance information", "Change requests", "Project management plan updates", "Project documents updates"]
+            },
+            "planScheduleManagement": {
+                title: "6.1 Plan Schedule Management",
+                inputs: ["Project charter", "Project management plan", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data analysis (Alternatives analysis)", "Meetings"],
+                outputs: ["Schedule management plan"]
+            },
+            "defineActivities": {
+                title: "6.2 Define Activities",
+                inputs: ["Project management plan (Schedule management plan, Scope baseline)", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Decomposition", "Rolling wave planning", "Meetings"],
+                outputs: ["Activity list", "Activity attributes", "Milestone list", "Change requests", "Project management plan updates"]
+            },
+            "sequenceActivities": {
+                title: "6.3 Sequence Activities",
+                inputs: ["Project management plan (Schedule management plan)", "Project documents (Activity list, Activity attributes, Assumption log, Milestone list)", "EEFs", "OPAs"],
+                tools: ["Precedence Diagramming Method (PDM)", "Dependency determination and integration", "Leads and lags", "PMIS"],
+                outputs: ["Project schedule network diagrams", "Project documents updates"]
+            },
+            "estimateActivityDurations": {
+                title: "6.4 Estimate Activity Durations",
+                inputs: ["Project management plan (Schedule management plan)", "Project documents (Activity list, Activity attributes, Assumption log, Risk register, etc.)", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Analogous estimating", "Parametric estimating", "Three-point estimating", "Bottom-up estimating", "Data analysis (Alternatives analysis, Reserve analysis)", "Decision making (Voting)", "Meetings"],
+                outputs: ["Duration estimates", "Basis of estimates", "Project documents updates"]
+            },
+            "developSchedule": {
+                title: "6.5 Develop Schedule",
+                inputs: ["Project management plan", "Project documents (Activity list, Assumption log, Duration estimates, Risk register, etc.)", "Agreements", "EEFs", "OPAs"],
+                tools: ["Schedule network analysis", "Critical path method", "Resource optimization", "Data analysis (What-if scenario, Simulation)", "Leads and lags", "Schedule compression", "PMIS", "Agile release planning"],
+                outputs: ["Schedule baseline", "Project schedule", "Schedule data", "Project calendars", "Change requests", "Project management plan updates", "Project documents updates"]
+            },
+            "controlSchedule": {
+                title: "6.6 Control Schedule",
+                inputs: ["Project management plan (Schedule management plan, Schedule baseline)", "Project documents (Lessons learned register, Project schedule, Resource calendars, etc.)", "Work performance data", "OPAs"],
+                tools: ["Data analysis (Earned value analysis, Iteration burndown chart, Performance reviews, Trend analysis, Variance analysis, What-if scenario)", "Critical path method", "PMIS", "Resource optimization", "Leads and lags", "Schedule compression"],
+                outputs: ["Work performance information", "Schedule forecasts", "Change requests", "Project management plan updates", "Project documents updates"]
+            },
+            "planCostManagement": {
+                title: "7.1 Plan Cost Management",
+                inputs: ["Project charter", "Project management plan", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data analysis (Alternatives analysis)", "Meetings"],
+                outputs: ["Cost management plan"]
+            },
+            "estimateCosts": {
+                title: "7.2 Estimate Costs",
+                inputs: ["Project management plan (Cost management plan, Quality management plan, Scope baseline)", "Project documents (Lessons learned register, Project schedule, Risk register, etc.)", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Analogous estimating", "Parametric estimating", "Bottom-up estimating", "Three-point estimating", "Data analysis (Alternatives analysis, Reserve analysis, Cost of quality)", "PMIS", "Decision making (Voting)"],
+                outputs: ["Cost estimates", "Basis of estimates", "Project documents updates"]
+            },
+            "determineBudget": {
+                title: "7.3 Determine Budget",
+                inputs: ["Project management plan (Cost management plan, Resource management plan, Scope baseline)", "Project documents (Basis of estimates, Cost estimates, Project schedule, Risk register)", "Business documents (Business case)", "Agreements", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Cost aggregation", "Data analysis (Reserve analysis)", "Historical information review", "Funding limit reconciliation", "Financing"],
+                outputs: ["Cost baseline", "Project funding requirements", "Project documents updates"]
+            },
+            "controlCost": {
+                title: "7.4 Control Cost",
+                inputs: ["Project management plan (Cost management plan, Cost baseline, Performance measurement baseline)", "Project documents (Lessons learned register)", "Project funding requirements", "Work performance data", "OPAs"],
+                tools: ["Expert judgment", "Data analysis (Earned value analysis, Variance analysis, Trend analysis, Reserve analysis)", "To-Complete Performance Index (TCPI)", "PMIS"],
+                outputs: ["Work performance information", "Cost forecasts", "Change requests", "Project management plan updates", "Project documents updates"]
+            },
+            "planQualityManagement": {
+                title: "8.1 Plan Quality Management",
+                inputs: ["Project charter", "Project management plan (Requirements management plan, Risk management plan, Stakeholder engagement plan, Scope baseline)", "Project documents (Requirements documentation, Risk register, Stakeholder register)", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data gathering (Benchmarking, Brainstorming, Interviews)", "Data analysis (Cost-benefit analysis, Cost of quality)", "Decision making (Multicriteria)", "Data representation (Flowcharts, Logical data models, Matrix diagrams, Mind mapping)", "Test and inspection planning", "Meetings"],
+                outputs: ["Quality management plan", "Quality metrics", "Project management plan updates", "Project documents updates"]
+            },
+            "manageQuality": {
+                title: "8.2 Manage Quality",
+                inputs: ["Project management plan (Quality management plan)", "Project documents (Lessons learned register, Quality control measurements, Quality metrics, Risk report)", "OPAs"],
+                tools: ["Data gathering (Checklists)", "Data analysis (Alternatives analysis, Document analysis, Process analysis, Root cause analysis)", "Decision making", "Data representation (Affinity diagrams, Cause-and-effect diagrams, Flowcharts, Histograms, Matrix diagrams, Scatter diagrams)", "Audits", "Design for X (DfX)", "Problem solving", "Quality improvement methods"],
+                outputs: ["Quality reports", "Test and evaluation documents", "Change requests", "Project management plan updates", "Project documents updates"]
+            },
+            "controlQuality": {
+                title: "8.3 Control Quality",
+                inputs: ["Project management plan", "Project documents (Lessons learned register, Quality metrics, Test and evaluation documents)", "Approved change requests", "Deliverables", "Work performance data", "EEFs", "OPAs"],
+                tools: ["Data gathering (Checklists, Check sheets, Statistical sampling, Questionnaires)", "Data analysis (Performance reviews, Root cause analysis)", "Inspection", "Testing/product evaluations", "Data representation (Cause-and-effect diagrams, Control charts, Histograms, Scatter diagrams)", "Meetings"],
+                outputs: ["Quality control measurements", "Verified deliverables", "Work performance information", "Change requests", "Project management plan updates", "Project documents updates"]
+            },
+            "planResourceManagement": {
+                title: "9.1 Plan Resource Management",
+                inputs: ["Project charter", "Project management plan (Quality management plan, Scope baseline, Schedule baseline)", "Project documents (Project schedule, Requirements documentation, Risk register, Stakeholder register)", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data representation (Hierarchical charts, RACI matrix, Text-oriented formats)", "Organizational theory", "Meetings"],
+                outputs: ["Resource management plan", "Team charter", "Project documents updates"]
+            },
+            "estimateActivityResources": {
+                title: "9.2 Estimate Activity Resources",
+                inputs: ["Project management plan (Resource management plan, Scope baseline)", "Project documents (Activity list, Activity attributes, Assumption log, Cost estimates, Resource calendars, Risk register)", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Bottom-up estimating", "Analogous estimating", "Parametric estimating", "Data analysis (Alternatives analysis)", "PMIS", "Meetings"],
+                outputs: ["Resource requirements", "Basis of estimates", "Resource breakdown structure", "Project documents updates"]
+            },
+            "acquireResources": {
+                title: "9.3 Acquire Resources",
+                inputs: ["Project management plan (Resource management plan, Procurement management plan, Cost baseline)", "Project documents (Project schedule, Resource calendars, Resource requirements, Stakeholder register)", "EEFs", "OPAs"],
+                tools: ["Decision making (Multicriteria)", "Interpersonal and team skills (Negotiation)", "Pre-assignment", "Virtual teams"],
+                outputs: ["Physical resource assignments", "Project team assignments", "Resource calendars", "Change requests", "Project management plan updates", "Project documents updates", "EEF updates", "OPA updates"]
+            },
+            "developTeam": {
+                title: "9.4 Develop Team",
+                inputs: ["Project management plan (Resource management plan)", "Project documents (Lessons learned register, Project schedule, Project team assignments, Resource calendars, Team charter)", "EEFs", "OPAs"],
+                tools: ["Colocation", "Virtual teams", "Communication technology", "Interpersonal and team skills (Conflict management, Influencing, Motivation, Negotiation, Team building)", "Recognition and rewards", "Training", "Individual and team assessments", "Meetings"],
+                outputs: ["Team performance assessments", "Change requests", "Project management plan updates", "Project documents updates", "EEF updates", "OPA updates"]
+            },
+            "manageTeam": {
+                title: "9.5 Manage Team",
+                inputs: ["Project management plan (Resource management plan)", "Project documents (Issue log, Lessons learned register, Project team assignments, Team charter)", "Work performance reports", "Team performance assessments", "EEFs", "OPAs"],
+                tools: ["Interpersonal and team skills (Conflict management, Decision making, Emotional intelligence, Influencing, Leadership)", "PMIS"],
+                outputs: ["Change requests", "Project management plan updates", "Project documents updates", "EEF updates"]
+            },
+            "controlResources": {
+                title: "9.6 Control Resources",
+                inputs: ["Project management plan (Resource management plan)", "Project documents (Issue log, Lessons learned register, Physical resource assignments, Project schedule, Resource breakdown structure, Risk register)", "Work performance data", "Agreements", "OPAs"],
+                tools: ["Data analysis (Alternatives analysis, Cost-benefit analysis, Performance reviews, Trend analysis)", "Problem solving", "Interpersonal and team skills (Negotiation, Influencing)", "PMIS"],
+                outputs: ["Work performance information", "Change requests", "Project management plan updates", "Project documents updates"]
+            },
+            "planCommunicationsManagement": {
+                title: "10.1 Plan Communications Management",
+                inputs: ["Project charter", "Project management plan (Resource management plan, Stakeholder engagement plan)", "Project documents (Requirements documentation, Stakeholder register)", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Communication requirements analysis", "Communication technology", "Communication models", "Communication methods", "Interpersonal and team skills (Communication styles assessment)", "Data representation (Stakeholder engagement assessment matrix)", "Meetings"],
+                outputs: ["Communications management plan", "Project management plan updates", "Project documents updates"]
+            },
+            "manageCommunications": {
+                title: "10.2 Manage Communications",
+                inputs: ["Project management plan (Communications management plan, Stakeholder engagement plan)", "Project documents (Change log, Issue log, Lessons learned register, Quality report, Risk report, Stakeholder register)", "Work performance reports", "EEFs", "OPAs"],
+                tools: ["Communication technology", "Communication methods", "Communication skills (Communication competence, Feedback, Nonverbal, Presentations)", "PMIS", "Project reporting", "Interpersonal and team skills (Active listening, Conflict management, Cultural awareness, Meeting management, Networking)", "Meetings"],
+                outputs: ["Project communications", "Project management plan updates", "Project documents updates", "OPA updates"]
+            },
+            "monitorCommunications": {
+                title: "10.3 Monitor Communications",
+                inputs: ["Project management plan (Communications management plan, Resource management plan, Stakeholder engagement plan)", "Project documents (Issue log, Lessons learned register, Project communications, Stakeholder register)", "Work performance data", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "PMIS", "Data analysis", "Interpersonal and team skills (Observation, Conversation)", "Meetings"],
+                outputs: ["Work performance information", "Change requests", "Project management plan updates", "Project documents updates"]
+            },
+            "planRiskManagement": {
+                title: "11.1 Plan Risk Management",
+                inputs: ["Project charter", "Project management plan", "Project documents (Stakeholder register)", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data analysis (Stakeholder analysis)", "Meetings"],
+                outputs: ["Risk management plan"]
+            },
+            "identifyRisks": {
+                title: "11.2 Identify Risks",
+                inputs: ["Project management plan", "Project documents (Assumption log, Cost estimates, Duration estimates, Requirements documentation, Resource requirements, Stakeholder register, etc.)", "Agreements", "Procurement documentation", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data gathering (Brainstorming, Checklists, Interviews)", "Data analysis (Root cause analysis, Assumption and constraint analysis, SWOT analysis, Document analysis)", "Interpersonal and team skills (Facilitation)", "Prompt lists", "Meetings"],
+                outputs: ["Risk register", "Risk report", "Project documents updates"]
+            },
+            "performQualitativeRiskAnalysis": {
+                title: "11.3 Perform Qualitative Risk Analysis",
+                inputs: ["Project management plan (Risk management plan)", "Project documents (Assumption log, Risk register, Stakeholder register)", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data gathering (Interviews)", "Data analysis (Risk data quality assessment, Risk probability and impact assessment, Assessment of other risk parameters)", "Interpersonal and team skills (Facilitation)", "Risk categorization", "Data representation (Probability and impact matrix, Hierarchical charts)", "Meetings"],
+                outputs: ["Project documents updates (Risk register, Risk report, Assumption log, etc.)"]
+            },
+            "performQuantitativeRiskAnalysis": {
+                title: "11.4 Perform Quantitative Risk Analysis",
+                inputs: ["Project management plan (Risk management plan)", "Project documents (Assumption log, Basis of estimates, Cost estimates, Duration estimates, Risk register, Schedule baseline, etc.)", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data gathering (Interviews)", "Interpersonal and team skills (Facilitation)", "Representations of uncertainty", "Data analysis (Simulations, Sensitivity analysis, Decision tree analysis, Influence diagrams)"],
+                outputs: ["Project documents updates (Risk report)"]
+            },
+            "planRiskResponses": {
+                title: "11.5 Plan Risk Responses",
+                inputs: ["Project management plan (Risk management plan, Cost baseline)", "Project documents (Lessons learned register, Project schedule, Risk register, Risk report, Stakeholder register)", "EEFs", "OPAs"],
+                tools: ["Expert judgment", "Data gathering (Interviews)", "Interpersonal and team skills (Facilitation)", "Strategies for negative risks (Escalate, Avoid, Transfer, Mitigate, Accept)", "Strategies for positive risks (Escalate, Exploit, Share, Enhance, Accept)", "Contingent response strategies", "Strategies for overall project risk", "Data analysis (Alternatives analysis, Cost-benefit analysis)", "Decision making (Multicriteria)"],
+                outputs: ["Change requests", "Project management plan updates", "Project documents updates"]
+            },
+            "implementRiskResponses": {
+                title: "11.6 Implement Risk Responses",
+                inputs: ["Project management plan (Risk management plan)", "Project documents (Lessons learned register, Risk register, Risk report)", "OPAs"],
+                tools: ["Expert judgment", "Interpersonal and team skills (Influencing)", "PMIS"],
+                outputs: ["Change requests", "Project documents updates"]
+            },
+            "monitorRisks": {
+                title: "11.7 Monitor Risks",
+                inputs: ["Project management plan (Risk management plan)", "Project documents (Issue log, Lessons learned register, Risk register, Risk report)", "Work performance data", "Work performance reports"],
+                tools: ["Data analysis (Technical performance analysis, Reserve analysis)", "Audits", "Meetings"],
+                outputs: ["Work performance information", "Change requests", "Project management plan updates", "Project documents updates", "OPA updates"]
+            },
+            ""developProjectCharter": {
+    title: "4.1 Develop Project Charter",
+    inputs: ["Business documents (Business case, Benefits management plan)", "Agreements", "Enterprise Environmental Factors (EEFs)", "Organizational Process Assets (OPAs)"],
+    tools: ["Expert judgment", "Data gathering (Brainstorming, Focus groups, Interviews)", "Interpersonal and team skills (Conflict management, Facilitation, Meeting management)", "Meetings"],
+    outputs: ["Project charter", "Assumption log"]
+},
+"developProjectManagementPlan": {
+    title: "4.2 Develop Project Management Plan",
+    inputs: ["Project charter", "Outputs from other processes", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data gathering (Brainstorming, Checklists, Focus groups, Interviews)", "Interpersonal and team skills (Conflict management, Facilitation, Meeting management)", "Meetings", "Change control tools", "PMIS"],
+    outputs: ["Project management plan"]
+},
+"directAndManageProjectWork": {
+    title: "4.3 Direct and Manage Project Work",
+    inputs: ["Project management plan", "Project documents (Change log, Lessons learned register, Milestone list, etc.)", "Approved change requests", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Project Management Information System (PMIS)", "Meetings"],
+    outputs: ["Deliverables", "Work performance data", "Issue log", "Change requests", "Project management plan updates", "Project documents updates", "OPA updates"]
+},
+"manageProjectKnowledge": {
+    title: "4.4 Manage Project Knowledge",
+    inputs: ["Project management plan", "Project documents (Lessons learned register, Resource breakdown structure, etc.)", "Deliverables", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Knowledge management", "Information management", "Interpersonal and team skills (Active listening, Facilitation, Leadership, etc.)"],
+    outputs: ["Lessons learned register", "Project management plan updates", "OPA updates"]
+},
+"monitorAndControlProjectWork": {
+    title: "4.5 Monitor and Control Project Work",
+    inputs: ["Project management plan", "Project documents (Assumption log, Cost forecasts, Issue log, Risk register, etc.)", "Work performance information", "Agreements", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data analysis (Alternatives analysis, Cost-benefit analysis, Trend analysis, etc.)", "Decision making", "Meetings"],
+    outputs: ["Work performance reports", "Change requests", "Project management plan updates", "Project documents updates"]
+},
+"performIntegratedChangeControl": {
+    title: "4.6 Perform Integrated Change Control",
+    inputs: ["Project management plan", "Project documents (Change log, Risk report, etc.)", "Work performance reports", "Change requests", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Change control tools", "Data analysis (Alternatives analysis, Cost-benefit analysis)", "Decision making (Voting, Autocratic, Multicriteria)", "Meetings"],
+    outputs: ["Approved change requests", "Project management plan updates", "Project documents updates (Change log)"]
+},
+"closeProjectOrPhase": {
+    title: "4.7 Close Project or Phase",
+    inputs: ["Project charter", "Project management plan", "Project documents (Assumption log, Lessons learned register, etc.)", "Accepted deliverables", "Business documents", "Agreements", "Procurement documentation", "OPAs"],
+    tools: ["Expert judgment", "Data analysis (Regression analysis, Trend analysis)", "Meetings"],
+    outputs: ["Final product, service, or result transition", "Final report", "Project documents updates (Lessons learned register)", "OPA updates"]
+},
+"planScopeManagement": {
+    title: "5.1 Plan Scope Management",
+    inputs: ["Project charter", "Project management plan", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data analysis (Alternatives analysis)", "Meetings"],
+    outputs: ["Scope management plan", "Requirements management plan"]
+},
+"collectRequirements": {
+    title: "5.2 Collect Requirements",
+    inputs: ["Project charter", "Project management plan", "Project documents (Assumption log, Stakeholder register, etc.)", "Business documents (Business case)", "Agreements", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data gathering (Brainstorming, Interviews, Focus groups, Questionnaires, Benchmarking)", "Data analysis (Document analysis)", "Decision making (Voting, Multicriteria)", "Data representation (Affinity diagrams, Mind mapping)", "Interpersonal and team skills (Nominal group technique, Observation, Facilitation)", "Context diagram", "Prototypes"],
+    outputs: ["Requirements documentation", "Requirements traceability matrix"]
+},
+"defineScope": {
+    title: "5.3 Define Scope",
+    inputs: ["Project charter", "Project management plan (Scope management plan)", "Project documents (Requirements documentation, Risk register, etc.)", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data analysis (Alternatives analysis)", "Decision making (Multicriteria)", "Interpersonal and team skills (Facilitation)", "Product analysis"],
+    outputs: ["Project scope statement", "Project documents updates"]
+},
+"createWBS": {
+    title: "5.4 Create WBS",
+    inputs: ["Project management plan (Scope management plan)", "Project documents (Project scope statement, Requirements documentation)", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Decomposition", "Meetings"],
+    outputs: ["Scope baseline", "Project documents updates"]
+},
+"validateScope": {
+    title: "5.5 Validate Scope",
+    inputs: ["Project management plan", "Project documents (Lessons learned register, Quality reports, Requirements documentation, etc.)", "Verified deliverables", "Work performance data"],
+    tools: ["Inspection", "Decision making (Voting)"],
+    outputs: ["Accepted deliverables", "Work performance information", "Change requests", "Project documents updates"]
+},
+"controlScope": {
+    title: "5.6 Control Scope",
+    inputs: ["Project management plan (Scope management plan, Scope baseline)", "Project documents (Lessons learned register, Requirements documentation, etc.)", "Work performance data", "OPAs"],
+    tools: ["Data analysis (Variance analysis, Trend analysis)"],
+    outputs: ["Work performance information", "Change requests", "Project management plan updates", "Project documents updates"]
+},
+"planScheduleManagement": {
+    title: "6.1 Plan Schedule Management",
+    inputs: ["Project charter", "Project management plan", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data analysis (Alternatives analysis)", "Meetings"],
+    outputs: ["Schedule management plan"]
+},
+"defineActivities": {
+    title: "6.2 Define Activities",
+    inputs: ["Project management plan (Schedule management plan, Scope baseline)", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Decomposition", "Rolling wave planning", "Meetings"],
+    outputs: ["Activity list", "Activity attributes", "Milestone list", "Change requests", "Project management plan updates"]
+},
+"sequenceActivities": {
+    title: "6.3 Sequence Activities",
+    inputs: ["Project management plan (Schedule management plan)", "Project documents (Activity list, Activity attributes, Assumption log, Milestone list)", "EEFs", "OPAs"],
+    tools: ["Precedence Diagramming Method (PDM)", "Dependency determination and integration", "Leads and lags", "PMIS"],
+    outputs: ["Project schedule network diagrams", "Project documents updates"]
+},
+"estimateActivityDurations": {
+    title: "6.4 Estimate Activity Durations",
+    inputs: ["Project management plan (Schedule management plan)", "Project documents (Activity list, Activity attributes, Assumption log, Risk register, etc.)", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Analogous estimating", "Parametric estimating", "Three-point estimating", "Bottom-up estimating", "Data analysis (Alternatives analysis, Reserve analysis)", "Decision making (Voting)", "Meetings"],
+    outputs: ["Duration estimates", "Basis of estimates", "Project documents updates"]
+},
+"developSchedule": {
+    title: "6.5 Develop Schedule",
+    inputs: ["Project management plan", "Project documents (Activity list, Assumption log, Duration estimates, Risk register, etc.)", "Agreements", "EEFs", "OPAs"],
+    tools: ["Schedule network analysis", "Critical path method", "Resource optimization", "Data analysis (What-if scenario, Simulation)", "Leads and lags", "Schedule compression", "PMIS", "Agile release planning"],
+    outputs: ["Schedule baseline", "Project schedule", "Schedule data", "Project calendars", "Change requests", "Project management plan updates", "Project documents updates"]
+},
+"controlSchedule": {
+    title: "6.6 Control Schedule",
+    inputs: ["Project management plan (Schedule management plan, Schedule baseline)", "Project documents (Lessons learned register, Project schedule, Resource calendars, etc.)", "Work performance data", "OPAs"],
+    tools: ["Data analysis (Earned value analysis, Iteration burndown chart, Performance reviews, Trend analysis, Variance analysis, What-if scenario)", "Critical path method", "PMIS", "Resource optimization", "Leads and lags", "Schedule compression"],
+    outputs: ["Work performance information", "Schedule forecasts", "Change requests", "Project management plan updates", "Project documents updates"]
+},
+"planCostManagement": {
+    title: "7.1 Plan Cost Management",
+    inputs: ["Project charter", "Project management plan", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data analysis (Alternatives analysis)", "Meetings"],
+    outputs: ["Cost management plan"]
+},
+"estimateCosts": {
+    title: "7.2 Estimate Costs",
+    inputs: ["Project management plan (Cost management plan, Quality management plan, Scope baseline)", "Project documents (Lessons learned register, Project schedule, Risk register, etc.)", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Analogous estimating", "Parametric estimating", "Bottom-up estimating", "Three-point estimating", "Data analysis (Alternatives analysis, Reserve analysis, Cost of quality)", "PMIS", "Decision making (Voting)"],
+    outputs: ["Cost estimates", "Basis of estimates", "Project documents updates"]
+},
+"determineBudget": {
+    title: "7.3 Determine Budget",
+    inputs: ["Project management plan (Cost management plan, Resource management plan, Scope baseline)", "Project documents (Basis of estimates, Cost estimates, Project schedule, Risk register)", "Business documents (Business case)", "Agreements", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Cost aggregation", "Data analysis (Reserve analysis)", "Historical information review", "Funding limit reconciliation", "Financing"],
+    outputs: ["Cost baseline", "Project funding requirements", "Project documents updates"]
+},
+"controlCost": {
+    title: "7.4 Control Cost",
+    inputs: ["Project management plan (Cost management plan, Cost baseline, Performance measurement baseline)", "Project documents (Lessons learned register)", "Project funding requirements", "Work performance data", "OPAs"],
+    tools: ["Expert judgment", "Data analysis (Earned value analysis, Variance analysis, Trend analysis, Reserve analysis)", "To-Complete Performance Index (TCPI)", "PMIS"],
+    outputs: ["Work performance information", "Cost forecasts", "Change requests", "Project management plan updates", "Project documents updates"]
+},
+"planQualityManagement": {
+    title: "8.1 Plan Quality Management",
+    inputs: ["Project charter", "Project management plan (Requirements management plan, Risk management plan, Stakeholder engagement plan, Scope baseline)", "Project documents (Requirements documentation, Risk register, Stakeholder register)", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data gathering (Benchmarking, Brainstorming, Interviews)", "Data analysis (Cost-benefit analysis, Cost of quality)", "Decision making (Multicriteria)", "Data representation (Flowcharts, Logical data models, Matrix diagrams, Mind mapping)", "Test and inspection planning", "Meetings"],
+    outputs: ["Quality management plan", "Quality metrics", "Project management plan updates", "Project documents updates"]
+},
+"manageQuality": {
+    title: "8.2 Manage Quality",
+    inputs: ["Project management plan (Quality management plan)", "Project documents (Lessons learned register, Quality control measurements, Quality metrics, Risk report)", "OPAs"],
+    tools: ["Data gathering (Checklists)", "Data analysis (Alternatives analysis, Document analysis, Process analysis, Root cause analysis)", "Decision making", "Data representation (Affinity diagrams, Cause-and-effect diagrams, Flowcharts, Histograms, Matrix diagrams, Scatter diagrams)", "Audits", "Design for X (DfX)", "Problem solving", "Quality improvement methods"],
+    outputs: ["Quality reports", "Test and evaluation documents", "Change requests", "Project management plan updates", "Project documents updates"]
+},
+"controlQuality": {
+    title: "8.3 Control Quality",
+    inputs: ["Project management plan", "Project documents (Lessons learned register, Quality metrics, Test and evaluation documents)", "Approved change requests", "Deliverables", "Work performance data", "EEFs", "OPAs"],
+    tools: ["Data gathering (Checklists, Check sheets, Statistical sampling, Questionnaires)", "Data analysis (Performance reviews, Root cause analysis)", "Inspection", "Testing/product evaluations", "Data representation (Cause-and-effect diagrams, Control charts, Histograms, Scatter diagrams)", "Meetings"],
+    outputs: ["Quality control measurements", "Verified deliverables", "Work performance information", "Change requests", "Project management plan updates", "Project documents updates"]
+},
+"planResourceManagement": {
+    title: "9.1 Plan Resource Management",
+    inputs: ["Project charter", "Project management plan (Quality management plan, Scope baseline, Schedule baseline)", "Project documents (Project schedule, Requirements documentation, Risk register, Stakeholder register)", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data representation (Hierarchical charts, RACI matrix, Text-oriented formats)", "Organizational theory", "Meetings"],
+    outputs: ["Resource management plan", "Team charter", "Project documents updates"]
+},
+"estimateActivityResources": {
+    title: "9.2 Estimate Activity Resources",
+    inputs: ["Project management plan (Resource management plan, Scope baseline)", "Project documents (Activity list, Activity attributes, Assumption log, Cost estimates, Resource calendars, Risk register)", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Bottom-up estimating", "Analogous estimating", "Parametric estimating", "Data analysis (Alternatives analysis)", "PMIS", "Meetings"],
+    outputs: ["Resource requirements", "Basis of estimates", "Resource breakdown structure", "Project documents updates"]
+},
+"acquireResources": {
+    title: "9.3 Acquire Resources",
+    inputs: ["Project management plan (Resource management plan, Procurement management plan, Cost baseline)", "Project documents (Project schedule, Resource calendars, Resource requirements, Stakeholder register)", "EEFs", "OPAs"],
+    tools: ["Decision making (Multicriteria)", "Interpersonal and team skills (Negotiation)", "Pre-assignment", "Virtual teams"],
+    outputs: ["Physical resource assignments", "Project team assignments", "Resource calendars", "Change requests", "Project management plan updates", "Project documents updates", "EEF updates", "OPA updates"]
+},
+"developTeam": {
+    title: "9.4 Develop Team",
+    inputs: ["Project management plan (Resource management plan)", "Project documents (Lessons learned register, Project schedule, Project team assignments, Resource calendars, Team charter)", "EEFs", "OPAs"],
+    tools: ["Colocation", "Virtual teams", "Communication technology", "Interpersonal and team skills (Conflict management, Influencing, Motivation, Negotiation, Team building)", "Recognition and rewards", "Training", "Individual and team assessments", "Meetings"],
+    outputs: ["Team performance assessments", "Change requests", "Project management plan updates", "Project documents updates", "EEF updates", "OPA updates"]
+},
+"manageTeam": {
+    title: "9.5 Manage Team",
+    inputs: ["Project management plan (Resource management plan)", "Project documents (Issue log, Lessons learned register, Project team assignments, Team charter)", "Work performance reports", "Team performance assessments", "EEFs", "OPAs"],
+    tools: ["Interpersonal and team skills (Conflict management, Decision making, Emotional intelligence, Influencing, Leadership)", "PMIS"],
+    outputs: ["Change requests", "Project management plan updates", "Project documents updates", "EEF updates"]
+},
+"controlResources": {
+    title: "9.6 Control Resources",
+    inputs: ["Project management plan (Resource management plan)", "Project documents (Issue log, Lessons learned register, Physical resource assignments, Project schedule, Resource breakdown structure, Risk register)", "Work performance data", "Agreements", "OPAs"],
+    tools: ["Data analysis (Alternatives analysis, Cost-benefit analysis, Performance reviews, Trend analysis)", "Problem solving", "Interpersonal and team skills (Negotiation, Influencing)", "PMIS"],
+    outputs: ["Work performance information", "Change requests", "Project management plan updates", "Project documents updates"]
+},
+"planCommunicationsManagement": {
+    title: "10.1 Plan Communications Management",
+    inputs: ["Project charter", "Project management plan (Resource management plan, Stakeholder engagement plan)", "Project documents (Requirements documentation, Stakeholder register)", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Communication requirements analysis", "Communication technology", "Communication models", "Communication methods", "Interpersonal and team skills (Communication styles assessment)", "Data representation (Stakeholder engagement assessment matrix)", "Meetings"],
+    outputs: ["Communications management plan", "Project management plan updates", "Project documents updates"]
+},
+"manageCommunications": {
+    title: "10.2 Manage Communications",
+    inputs: ["Project management plan (Communications management plan, Stakeholder engagement plan)", "Project documents (Change log, Issue log, Lessons learned register, Quality report, Risk report, Stakeholder register)", "Work performance reports", "EEFs", "OPAs"],
+    tools: ["Communication technology", "Communication methods", "Communication skills (Communication competence, Feedback, Nonverbal, Presentations)", "PMIS", "Project reporting", "Interpersonal and team skills (Active listening, Conflict management, Cultural awareness, Meeting management, Networking)", "Meetings"],
+    outputs: ["Project communications", "Project management plan updates", "Project documents updates", "OPA updates"]
+},
+"monitorCommunications": {
+    title: "10.3 Monitor Communications",
+    inputs: ["Project management plan (Communications management plan, Resource management plan, Stakeholder engagement plan)", "Project documents (Issue log, Lessons learned register, Project communications, Stakeholder register)", "Work performance data", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "PMIS", "Data analysis", "Interpersonal and team skills (Observation, Conversation)", "Meetings"],
+    outputs: ["Work performance information", "Change requests", "Project management plan updates", "Project documents updates"]
+},
+"planRiskManagement": {
+    title: "11.1 Plan Risk Management",
+    inputs: ["Project charter", "Project management plan", "Project documents (Stakeholder register)", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data analysis (Stakeholder analysis)", "Meetings"],
+    outputs: ["Risk management plan"]
+},
+"identifyRisks": {
+    title: "11.2 Identify Risks",
+    inputs: ["Project management plan", "Project documents (Assumption log, Cost estimates, Duration estimates, Requirements documentation, Resource requirements, Stakeholder register, etc.)", "Agreements", "Procurement documentation", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data gathering (Brainstorming, Checklists, Interviews)", "Data analysis (Root cause analysis, Assumption and constraint analysis, SWOT analysis, Document analysis)", "Interpersonal and team skills (Facilitation)", "Prompt lists", "Meetings"],
+    outputs: ["Risk register", "Risk report", "Project documents updates"]
+},
+"performQualitativeRiskAnalysis": {
+    title: "11.3 Perform Qualitative Risk Analysis",
+    inputs: ["Project management plan (Risk management plan)", "Project documents (Assumption log, Risk register, Stakeholder register)", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data gathering (Interviews)", "Data analysis (Risk data quality assessment, Risk probability and impact assessment, Assessment of other risk parameters)", "Interpersonal and team skills (Facilitation)", "Risk categorization", "Data representation (Probability and impact matrix, Hierarchical charts)", "Meetings"],
+    outputs: ["Project documents updates (Risk register, Risk report, Assumption log, etc.)"]
+},
+"performQuantitativeRiskAnalysis": {
+    title: "11.4 Perform Quantitative Risk Analysis",
+    inputs: ["Project management plan (Risk management plan)", "Project documents (Assumption log, Basis of estimates, Cost estimates, Duration estimates, Risk register, Schedule baseline, etc.)", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data gathering (Interviews)", "Interpersonal and team skills (Facilitation)", "Representations of uncertainty", "Data analysis (Simulations, Sensitivity analysis, Decision tree analysis, Influence diagrams)"],
+    outputs: ["Project documents updates (Risk report)"]
+},
+"planRiskResponses": {
+    title: "11.5 Plan Risk Responses",
+    inputs: ["Project management plan (Risk management plan, Cost baseline)", "Project documents (Lessons learned register, Project schedule, Risk register, Risk report, Stakeholder register)", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data gathering (Interviews)", "Interpersonal and team skills (Facilitation)", "Strategies for negative risks (Escalate, Avoid, Transfer, Mitigate, Accept)", "Strategies for positive risks (Escalate, Exploit, Share, Enhance, Accept)", "Contingent response strategies", "Strategies for overall project risk", "Data analysis (Alternatives analysis, Cost-benefit analysis)", "Decision making (Multicriteria)"],
+    outputs: ["Change requests", "Project management plan updates", "Project documents updates"]
+},
+"implementRiskResponses": {
+    title: "11.6 Implement Risk Responses",
+    inputs: ["Project management plan (Risk management plan)", "Project documents (Lessons learned register, Risk register, Risk report)", "OPAs"],
+    tools: ["Expert judgment", "Interpersonal and team skills (Influencing)", "PMIS"],
+    outputs: ["Change requests", "Project documents updates"]
+},
+"monitorRisks": {
+    title: "11.7 Monitor Risks",
+    inputs: ["Project management plan (Risk management plan)", "Project documents (Issue log, Lessons learned register, Risk register, Risk report)", "Work performance data", "Work performance reports"],
+    tools: ["Data analysis (Technical performance analysis, Reserve analysis)", "Audits", "Meetings"],
+    outputs: ["Work performance information", "Change requests", "Project management plan updates", "Project documents updates", "OPA updates"]
+},"planProcurementManagement": {
+    title: "12.1 Plan Procurement Management",
+    inputs: ["Project charter", "Business documents (Business case)", "Project management plan (Scope management plan, Quality management plan, Resource management plan, Scope baseline)", "Project documents (Milestone list, Project team assignments, Requirements documentation, Risk register, Stakeholder register)", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data gathering (Market research)", "Data analysis (Make-or-buy analysis)", "Source selection analysis", "Meetings"],
+    outputs: ["Procurement management plan", "Procurement strategy", "Bid documents", "Procurement statement of work (SOW)", "Source selection criteria", "Make-or-buy decisions", "Independent cost estimates (ICE)", "Change requests", "Project documents updates", "OPA updates"]
+},
+"conductProcurements": {
+    title: "12.2 Conduct Procurements",
+    inputs: ["Project management plan (Communications management plan, Procurement management plan, Cost baseline)", "Project documents (Lessons learned register, Risk register, Stakeholder register)", "Procurement documentation (Bid documents, Procurement SOW, etc.)", "Seller proposals", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Advertising", "Bidder conferences", "Data analysis (Proposal evaluation)", "Interpersonal and team skills (Negotiation)"],
+    outputs: ["Selected sellers", "Agreements", "Change requests", "Project management plan updates", "Project documents updates", "OPA updates"]
+},
+"controlProcurements": {
+    title: "12.3 Control Procurements",
+    inputs: ["Project management plan (Procurement management plan, Requirements management plan, Risk management plan, Change management plan, Schedule baseline)", "Project documents (Assumption log, Lessons learned register, Risk register, Stakeholder register)", "Agreements", "Procurement documentation", "Approved change requests", "Work performance data", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Claims administration", "Data analysis (Performance reviews, Trend analysis, Earned value analysis, Variance analysis)", "Inspection", "Audits"],
+    outputs: ["Closed procurements", "Work performance information", "Procurement documentation updates", "Change requests", "Project management plan updates", "Project documents updates", "OPA updates"]
+},
+"identifyStakeholders": {
+    title: "13.1 Identify Stakeholders",
+    inputs: ["Project charter", "Business documents (Business case)", "Project management plan", "Project documents (Change log, Issue log, Requirements documentation)", "Agreements", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data gathering (Questionnaires, Brainstorming)", "Data analysis (Stakeholder analysis, Document analysis)", "Data representation (Stakeholder mapping)", "Meetings"],
+    outputs: ["Stakeholder register", "Change requests", "Project management plan updates", "Project documents updates"]
+},
+"planStakeholderEngagement": {
+    title: "13.2 Plan Stakeholder Engagement",
+    inputs: ["Project charter", "Project management plan (Communications management plan, Risk management plan)", "Project documents (Assumption log, Change log, Issue log, Project schedule, Risk register, Stakeholder register)", "Agreements", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Data gathering (Benchmarking)", "Data analysis (Assumption and constraint analysis, Root cause analysis)", "Decision making (Prioritization)", "Data representation (Mind mapping, Stakeholder engagement assessment matrix)", "Meetings"],
+    outputs: ["Stakeholder engagement plan"]
+},
+"manageStakeholderEngagement": {
+    title: "13.3 Manage Stakeholder Engagement",
+    inputs: ["Project management plan (Communications management plan, Stakeholder engagement plan)", "Project documents (Change log, Issue log, Lessons learned register, Stakeholder register)", "EEFs", "OPAs"],
+    tools: ["Expert judgment", "Communication skills (Feedback)", "Interpersonal and team skills (Conflict management, Cultural awareness, Negotiation, Observation, Political awareness)", "Ground rules", "Meetings"],
+    outputs: ["Change requests", "Project management plan updates", "Project documents updates"]
+},
+"monitorStakeholderEngagement": {
+    title: "13.4 Monitor Stakeholder Engagement",
+    inputs: ["Project management plan (Resource management plan, Communications management plan, Stakeholder engagement plan)", "Project documents (Issue log, Lessons learned register, Project communications, Risk register, Stakeholder register)", "Work performance data", "EEFs", "OPAs"],
+    tools: ["Data analysis (Alternatives analysis, Root cause analysis, Stakeholder analysis)", "Decision making (Multicriteria, Voting)", "Data representation (Stakeholder engagement assessment matrix)", "Communication skills (Feedback)", "Interpersonal and team skills (Active listening, Cultural awareness, Leadership, Networking, Political awareness)", "Meetings"],
+    outputs: ["Work performance information", "Change requests", "Project management plan updates", "Project documents updates"]
+}
