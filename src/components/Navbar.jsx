@@ -1,15 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { BookOpen, LayoutDashboard, UserCircle } from 'lucide-react';
+import { BookOpen, UserCircle, Menu, X } from 'lucide-react';
 
 const Navbar = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const navLinks = [
     { path: '/', name: 'Dashboard' },
     { path: '/domains', name: 'Domains' },
     { path: '/principles', name: 'Principles' },
     { path: '/process-grid', name: 'Process Grid' },
     { path: '/models-methods', name: 'Tools' },
+    { path: '/agile', name: 'Agile' },
+    { path: '/exam-prep', name: 'Exam Prep' },
   ];
 
   return (
@@ -24,7 +28,8 @@ const Navbar = () => {
               <span className="font-bold text-xl text-slate-900">PMP Study Guide</span>
             </div>
             
-            <div className="hidden md:ml-10 md:flex md:space-x-8">
+            {/* Desktop Navigation */}
+            <div className="hidden lg:ml-10 lg:flex lg:space-x-6">
               {navLinks.map((link) => (
                 <NavLink
                   key={link.path}
@@ -48,20 +53,60 @@ const Navbar = () => {
               href="https://tegnum.edu.pe/wp-content/uploads/2023/09/Project-Management-Institute-A-Guide-to-the-Project-Management-Body-of-Knowledge-PMBOK-R-Guide-PMBOK%C2%AE%EF%B8%8F-Guide-Project-Management-Institute-2021.pdf" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-sm font-medium text-slate-500 hover:text-purple-600 transition-colors"
+              className="hidden sm:block text-sm font-medium text-slate-500 hover:text-purple-600 transition-colors"
             >
               PMBOK PDF
             </a>
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm font-medium border border-green-100">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm font-medium border border-green-100">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               Study Mode
             </div>
             <button className="text-slate-400 hover:text-slate-600">
               <UserCircle size={24} />
             </button>
+            
+            {/* Mobile menu button */}
+            <button 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden text-slate-600 hover:text-slate-900"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Navigation */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden border-t border-slate-200 bg-white">
+          <div className="px-4 py-3 space-y-1">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                onClick={() => setMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `block px-3 py-2 rounded-lg text-base font-medium transition-colors ${
+                    isActive
+                      ? 'bg-purple-50 text-purple-700'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  }`
+                }
+              >
+                {link.name}
+              </NavLink>
+            ))}
+            <a 
+              href="https://tegnum.edu.pe/wp-content/uploads/2023/09/Project-Management-Institute-A-Guide-to-the-Project-Management-Body-of-Knowledge-PMBOK-R-Guide-PMBOK%C2%AE%EF%B8%8F-Guide-Project-Management-Institute-2021.pdf" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block px-3 py-2 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-purple-600"
+            >
+              PMBOK PDF
+            </a>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
