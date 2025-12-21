@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { BookOpen, UserCircle, Menu, X } from 'lucide-react';
@@ -35,12 +34,8 @@ const Navbar = () => {
               </div>
               <span className="font-bold text-lg sm:text-xl text-slate-900">PMP Study Guide</span>
             </div>
-<<<<<<< HEAD
-            
-            {/* Desktop Navigation */}
-=======
 
->>>>>>> 180abd4f68bb766e7881cfc8d99b5c10541f64db
+            {/* Desktop Navigation */}
             <div className="hidden lg:ml-10 lg:flex lg:space-x-6">
               {navLinks.map((link) => (
                 <NavLink
@@ -65,42 +60,22 @@ const Navbar = () => {
               href="https://tegnum.edu.pe/wp-content/uploads/2023/09/Project-Management-Institute-A-Guide-to-the-Project-Management-Body-of-Knowledge-PMBOK-R-Guide-PMBOK%C2%AE%EF%B8%8F-Guide-Project-Management-Institute-2021.pdf"
               target="_blank"
               rel="noopener noreferrer"
-<<<<<<< HEAD
-              className="hidden sm:block text-sm font-medium text-slate-500 hover:text-purple-600 transition-colors"
-            >
-              PMBOK PDF
-            </a>
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm font-medium border border-green-100">
-=======
               className="hidden lg:block text-sm font-medium text-slate-500 hover:text-purple-600 transition-colors whitespace-nowrap"
             >
               PMBOK PDF
             </a>
             <div className="flex items-center gap-1.5 px-2 py-1.5 bg-green-50 text-green-700 rounded-full text-xs font-medium border border-green-100">
->>>>>>> 180abd4f68bb766e7881cfc8d99b5c10541f64db
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span className="hidden sm:inline">Study </span>Mode
             </div>
             <button className="hidden sm:block text-slate-400 hover:text-slate-600">
               <UserCircle size={24} />
             </button>
-            
-            {/* Mobile menu button */}
-            <button 
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden text-slate-600 hover:text-slate-900"
-            >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
           </div>
         </div>
       </div>
 
-<<<<<<< HEAD
       {/* Mobile Navigation */}
-=======
-      {/* Mobile menu */}
->>>>>>> 180abd4f68bb766e7881cfc8d99b5c10541f64db
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-slate-200 bg-white">
           <div className="px-4 py-3 space-y-1">
@@ -110,11 +85,7 @@ const Navbar = () => {
                 to={link.path}
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
-<<<<<<< HEAD
-                  `block px-3 py-2 rounded-lg text-base font-medium transition-colors ${
-=======
                   `block px-3 py-2.5 rounded-lg text-base font-medium transition-colors ${
->>>>>>> 180abd4f68bb766e7881cfc8d99b5c10541f64db
                     isActive
                       ? 'bg-purple-50 text-purple-700'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
@@ -124,19 +95,11 @@ const Navbar = () => {
                 {link.name}
               </NavLink>
             ))}
-<<<<<<< HEAD
-            <a 
-              href="https://tegnum.edu.pe/wp-content/uploads/2023/09/Project-Management-Institute-A-Guide-to-the-Project-Management-Body-of-Knowledge-PMBOK-R-Guide-PMBOK%C2%AE%EF%B8%8F-Guide-Project-Management-Institute-2021.pdf" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="block px-3 py-2 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-purple-600"
-=======
             <a
               href="https://tegnum.edu.pe/wp-content/uploads/2023/09/Project-Management-Institute-A-Guide-to-the-Project-Management-Body-of-Knowledge-PMBOK-R-Guide-PMBOK%C2%AE%EF%B8%8F-Guide-Project-Management-Institute-2021.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="block px-3 py-2.5 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-purple-600"
->>>>>>> 180abd4f68bb766e7881cfc8d99b5c10541f64db
             >
               PMBOK PDF
             </a>
