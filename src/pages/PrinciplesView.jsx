@@ -16,16 +16,16 @@ const PrinciplesView = () => {
 
   return (
     <div>
-      <header className="mb-10 text-center max-w-3xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+      <header className="mb-6 sm:mb-10 text-center max-w-3xl mx-auto px-2">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-3 sm:mb-4">
           The <span className="text-purple-600">12 Principles</span>
         </h1>
-        <p className="text-slate-600 text-lg">
+        <p className="text-sm sm:text-base md:text-lg text-slate-600">
           Foundational mindsets and guidelines for project professionals. These principles are not prescriptive rules, but universal truths that guide behavior.
         </p>
       </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
         {principles.map((principle, index) => {
           const Icon = iconMap[principle.icon] || Shield;
           return (
@@ -36,13 +36,13 @@ const PrinciplesView = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="bg-white border border-slate-200 p-6 rounded-2xl cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group relative overflow-hidden"
+              className="bg-white border border-slate-200 p-4 sm:p-6 rounded-xl sm:rounded-2xl cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group relative overflow-hidden"
             >
-              <div className="p-3 rounded-xl bg-purple-50 w-fit mb-4 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                <Icon size={24} />
+              <div className="p-2.5 sm:p-3 rounded-lg sm:rounded-xl bg-purple-50 w-fit mb-3 sm:mb-4 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                <Icon size={20} className="sm:w-6 sm:h-6" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">{principle.title}</h3>
-              <p className="text-slate-500 text-sm line-clamp-2">{principle.description}</p>
+              <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-1.5 sm:mb-2">{principle.title}</h3>
+              <p className="text-slate-500 text-xs sm:text-sm line-clamp-2">{principle.description}</p>
             </motion.div>
           );
         })}
@@ -61,36 +61,36 @@ const PrinciplesView = () => {
             
             <motion.div
               layoutId={selectedId}
-              className="bg-white w-full max-w-2xl rounded-3xl p-8 relative z-10 shadow-2xl"
+              className="bg-white w-full max-w-2xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto"
             >
-              <button 
+              <button
                 onClick={() => setSelectedId(null)}
-                className="absolute top-6 right-6 p-2 rounded-full bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-colors"
+                className="absolute top-4 sm:top-6 right-4 sm:right-6 p-2 rounded-full bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-colors"
               >
                 <X size={20} />
               </button>
 
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-4 rounded-2xl bg-purple-100 text-purple-600">
+              <div className="flex items-center gap-3 sm:gap-4 mb-5 sm:mb-6 pr-10">
+                <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-purple-100 text-purple-600 shrink-0">
                   {(() => {
                     const Icon = iconMap[selectedPrinciple.icon] || Shield;
-                    return <Icon size={32} />;
+                    return <Icon size={24} className="sm:w-8 sm:h-8" />;
                   })()}
                 </div>
-                <h2 className="text-3xl font-bold text-slate-900">{selectedPrinciple.title}</h2>
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900">{selectedPrinciple.title}</h2>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <div>
-                  <h3 className="text-sm font-bold text-purple-600 uppercase tracking-wider mb-2">Core Concept</h3>
-                  <p className="text-xl text-slate-800 font-medium leading-relaxed">
+                  <h3 className="text-xs sm:text-sm font-bold text-purple-600 uppercase tracking-wider mb-2">Core Concept</h3>
+                  <p className="text-base sm:text-lg lg:text-xl text-slate-800 font-medium leading-relaxed">
                     {selectedPrinciple.description}
                   </p>
                 </div>
-                
-                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                  <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Detailed Explanation</h3>
-                  <p className="text-slate-600 leading-relaxed">
+
+                <div className="bg-slate-50 p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-100">
+                  <h3 className="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 sm:mb-3">Detailed Explanation</h3>
+                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                     {selectedPrinciple.details}
                   </p>
                 </div>
