@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { BookOpen, UserCircle, Menu, X } from 'lucide-react';
+import React, { useState } from "react";
+import { NavLink } from "react-router-dom";
+import { BookOpen, UserCircle, Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { path: '/', name: 'Dashboard' },
-    { path: '/domains', name: 'Domains' },
-    { path: '/principles', name: 'Principles' },
-    { path: '/process-grid', name: 'Process Grid' },
-    { path: '/models-methods', name: 'Tools' },
-    { path: '/agile', name: 'Agile' },
-    { path: '/exam-prep', name: 'Exam Prep' },
+    { path: "/", name: "Dashboard" },
+    { path: "/domains", name: "Domains" },
+    { path: "/principles", name: "Principles" },
+    { path: "/process-grid", name: "Process Grid" },
+    { path: "/models-methods", name: "Tools" },
+    { path: "/agile", name: "Agile" },
+    { path: "/exam-prep", name: "Exam Prep" },
   ];
 
   return (
@@ -32,7 +32,9 @@ const Navbar = () => {
               <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center text-white">
                 <BookOpen size={20} />
               </div>
-              <span className="font-bold text-lg sm:text-xl text-slate-900">PMP Study Guide</span>
+              <span className="font-bold text-lg sm:text-xl text-slate-900">
+                PMP Study Guide
+              </span>
             </div>
 
             {/* Desktop Navigation */}
@@ -44,8 +46,8 @@ const Navbar = () => {
                   className={({ isActive }) =>
                     `inline-flex items-center px-1 pt-1 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                       isActive
-                        ? 'border-purple-600 text-slate-900'
-                        : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                        ? "border-purple-600 text-slate-900"
+                        : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
                     }`
                   }
                 >
@@ -56,14 +58,14 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-2 lg:gap-4">
-            <a
+            {/* <a
               href="https://tegnum.edu.pe/wp-content/uploads/2023/09/Project-Management-Institute-A-Guide-to-the-Project-Management-Body-of-Knowledge-PMBOK-R-Guide-PMBOK%C2%AE%EF%B8%8F-Guide-Project-Management-Institute-2021.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden lg:block text-sm font-medium text-slate-500 hover:text-purple-600 transition-colors whitespace-nowrap"
             >
               PMBOK PDF
-            </a>
+            </a> */}
             <div className="flex items-center gap-1.5 px-2 py-1.5 bg-green-50 text-green-700 rounded-full text-xs font-medium border border-green-100">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span className="hidden sm:inline">Study </span>Mode
@@ -87,8 +89,8 @@ const Navbar = () => {
                 className={({ isActive }) =>
                   `block px-3 py-2.5 rounded-lg text-base font-medium transition-colors ${
                     isActive
-                      ? 'bg-purple-50 text-purple-700'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                      ? "bg-purple-50 text-purple-700"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                   }`
                 }
               >
