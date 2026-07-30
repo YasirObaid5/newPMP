@@ -1,119 +1,122 @@
-
+﻿
 import React, { useState } from 'react';
 import { performanceDomains } from '../pmpData';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Users, UserCheck, GitMerge, Calendar, Briefcase, 
-  Package, BarChart2, AlertTriangle, CheckCircle2, 
-  Sparkles, Target 
-} from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 
-const iconMap = {
-  Users, UserCheck, GitMerge, Calendar, Briefcase, 
-  Package, BarChart2, AlertTriangle
-};
+const pad = (n) => String(n).padStart(2, '0');
 
 const DomainsView = () => {
   const [activeTab, setActiveTab] = useState(performanceDomains[0].id);
-
-  const activeDomain = performanceDomains.find(d => d.id === activeTab);
-  const Icon = iconMap[activeDomain.icon];
+  const activeDomain = performanceDomains.find((d) => d.id === activeTab);
+  const activeIndex = performanceDomains.findIndex((d) => d.id === activeTab);
 
   return (
-    <div className="min-h-[calc(100vh-8rem)] flex flex-col">
-      <header className="mb-6 lg:mb-8 shrink-0">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-2 sm:mb-4">
-          Performance <span className="text-purple-600">Domains</span>
-        </h1>
-        <p className="text-sm sm:text-base text-slate-600 max-w-3xl">
-          Groups of related activities that are critical for the effective delivery of project outcomes.
-        </p>
-      </header>
+    <div>
+      <PageHeader
+        number="§ II"
+        kicker="Delivery"
+        title="Performance Domains"
+        standfirst="Groups of related activities that are critical to the effective delivery of project outcomes."
+        note="The eight domains operate simultaneously rather than in sequence. Weakness in one shows up as a symptom in another."
+      />
 
-      <div className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-8 min-h-0">
-        {/* Tabs - Horizontal scroll on mobile, Sidebar on large screens */}
-        <div className="lg:w-80 shrink-0 overflow-x-auto lg:overflow-x-visible lg:overflow-y-auto lg:pr-2 custom-scrollbar">
-          <div className="flex lg:flex-col gap-2 pb-2 lg:pb-0 min-w-max lg:min-w-0">
-            {performanceDomains.map((domain) => {
-              const DomainIcon = iconMap[domain.icon];
-              return (
-                <button
-                  key={domain.id}
-                  onClick={() => setActiveTab(domain.id)}
-                  className={`flex items-center gap-2 lg:gap-3 px-3 lg:px-4 py-2.5 lg:py-4 rounded-xl text-left transition-all duration-200 border whitespace-nowrap lg:whitespace-normal lg:w-full ${
-                    activeTab === domain.id
-                      ? 'bg-white border-purple-200 shadow-md text-purple-700'
-                      : 'bg-white/60 lg:bg-transparent border-slate-200 lg:border-transparent hover:bg-white/80 lg:hover:bg-white/60 text-slate-500 hover:text-slate-700'
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-8">
+        {/* Contents column */}
+        <nav className="lg:col-span-3">
+          <p className="label border-b border-rule pb-2 mb-1 hidden lg:block">The eight domains</p>
+          <div className="flex lg:flex-col overflow-x-auto lg:overflow-visible
+                          gap-0 -mx-4 px-4 lg:mx-0 lg:px-0 custom-scrollbar
+                          border-b lg:border-b-0 border-rule">
+            {performanceDomains.map((domain, i) => (
+              <button
+                key={domain.id}
+                onClick={() => setActiveTab(domain.id)}
+                className={`group flex items-baseline gap-3 shrink-0 lg:shrink
+                            whitespace-nowrap lg:whitespace-normal text-left
+                            px-3 lg:px-0 py-3 lg:border-b lg:border-rule
+                            transition-colors ${
+                  activeTab === domain.id
+                    ? 'text-ink'
+                    : 'text-ink-muted hover:text-ink-soft'
+                }`}
+              >
+                <span
+                  className={`text-[11px] font-text font-semibold tabular-nums shrink-0 ${
+                    activeTab === domain.id ? 'text-saffron' : 'text-ink-faint'
                   }`}
                 >
-                  <div className={`p-1.5 lg:p-2 rounded-lg ${activeTab === domain.id ? 'bg-purple-100 text-purple-600' : 'bg-slate-100'}`}>
-                    <DomainIcon size={16} className="lg:w-[18px] lg:h-[18px]" />
-                  </div>
-                  <span className="font-medium text-sm lg:text-base">{domain.title}</span>
-                </button>
-              );
-            })}
+                  {pad(i + 1)}
+                </span>
+                <span className="font-display text-[15px] leading-snug">{domain.title}</span>
+                {activeTab === domain.id && (
+                  <span className="hidden lg:block ml-auto w-4 h-px bg-lapis self-center" />
+                )}
+              </button>
+            ))}
           </div>
-        </div>
+        </nav>
 
-        {/* Content Area */}
-        <div className="flex-1 bg-white border border-slate-200 rounded-2xl lg:rounded-3xl p-4 sm:p-6 md:p-8 overflow-y-auto custom-scrollbar shadow-sm">
+        {/* Text column */}
+        <div className="lg:col-span-9 lg:border-l lg:border-rule lg:pl-12">
           <AnimatePresence mode="wait">
-            <motion.div
+            <motion.article
               key={activeDomain.id}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
             >
-              <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-6 sm:mb-8">
-                <div className="p-3 sm:p-5 rounded-xl sm:rounded-2xl bg-purple-50 text-purple-600 shrink-0">
-                  <Icon size={32} className="sm:w-10 sm:h-10" />
-                </div>
-                <div>
-                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 mb-2">{activeDomain.title}</h2>
-                  <p className="text-base sm:text-lg lg:text-xl text-slate-600 leading-relaxed">{activeDomain.description}</p>
-                </div>
+              <div className="flex items-baseline gap-4 border-b border-rule-strong pb-3 mb-7">
+                <span className="numeral text-sm font-semibold">{pad(activeIndex + 1)}</span>
+                <span className="label">Performance domain</span>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-                {/* Key Activities */}
-                <div className="space-y-6">
-                  <h3 className="text-lg font-bold flex items-center gap-2 text-slate-900">
-                    <div className="p-1.5 bg-blue-100 text-blue-600 rounded-lg">
-                      <Sparkles size={18} />
-                    </div>
-                    Key Activities
-                  </h3>
-                  <div className="space-y-3">
+              <h2 className="font-display text-3xl sm:text-[2.5rem] font-semibold text-ink leading-[1.1]">
+                {activeDomain.title}
+              </h2>
+              <p className="page-standfirst mt-4">{activeDomain.description}</p>
+
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-12 gap-y-12 mt-12">
+                {/* Activities */}
+                <section>
+                  <h3 className="label border-b border-rule pb-2 mb-1">Key activities</h3>
+                  <ol>
                     {activeDomain.details.map((detail, i) => (
-                      <div key={i} className="flex gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
-                        <div className="mt-2 w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
-                        <p className="text-slate-700">{detail}</p>
-                      </div>
+                      <li
+                        key={i}
+                        className="flex items-baseline gap-4 py-3.5 border-b border-rule"
+                      >
+                        <span className="figure font-text text-[11px] font-semibold text-ink-faint shrink-0 w-4">
+                          {pad(i + 1)}
+                        </span>
+                        <span className="font-text text-[15px] text-ink-soft leading-relaxed">
+                          {detail}
+                        </span>
+                      </li>
                     ))}
-                  </div>
-                </div>
+                  </ol>
+                </section>
 
-                {/* Desired Outcomes */}
-                <div className="space-y-6">
-                  <h3 className="text-lg font-bold flex items-center gap-2 text-slate-900">
-                    <div className="p-1.5 bg-green-100 text-green-600 rounded-lg">
-                      <Target size={18} />
-                    </div>
-                    Desired Outcomes
-                  </h3>
-                  <div className="space-y-3">
+                {/* Outcomes */}
+                <section>
+                  <h3 className="label-accent border-b border-lapis/30 pb-2 mb-1">Desired outcomes</h3>
+                  <ol>
                     {activeDomain.outcomes.map((outcome, i) => (
-                      <div key={i} className="flex gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100">
-                        <CheckCircle2 size={20} className="text-green-500 shrink-0 mt-0.5" />
-                        <p className="text-slate-700">{outcome}</p>
-                      </div>
+                      <li
+                        key={i}
+                        className="flex items-baseline gap-4 py-3.5 border-b border-rule"
+                      >
+                        <span className="text-lapis shrink-0 w-4 text-sm leading-none">—</span>
+                        <span className="font-text text-[15px] text-ink-soft leading-relaxed">
+                          {outcome}
+                        </span>
+                      </li>
                     ))}
-                  </div>
-                </div>
+                  </ol>
+                </section>
               </div>
-            </motion.div>
+            </motion.article>
           </AnimatePresence>
         </div>
       </div>

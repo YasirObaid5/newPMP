@@ -1,97 +1,101 @@
-
+﻿
 import React, { useState } from 'react';
 import { principles } from '../pmpData';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Shield, Users, MessageCircle, Target, Share2, Award, Sliders, CheckSquare, Layers, AlertTriangle, RefreshCw, TrendingUp } from 'lucide-react';
+import { X } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 
-const iconMap = {
-  Shield, Users, MessageCircle, Target, Share2, Award, 
-  Sliders, CheckSquare, Layers, AlertTriangle, RefreshCw, TrendingUp
-};
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
 
 const PrinciplesView = () => {
   const [selectedId, setSelectedId] = useState(null);
-
-  const selectedPrinciple = principles.find(p => p.id === selectedId);
+  const selected = principles.find((p) => p.id === selectedId);
+  const selectedIndex = principles.findIndex((p) => p.id === selectedId);
 
   return (
     <div>
-      <header className="mb-6 sm:mb-10 text-center max-w-3xl mx-auto px-2">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-3 sm:mb-4">
-          The <span className="text-purple-600">12 Principles</span>
-        </h1>
-        <p className="text-sm sm:text-base md:text-lg text-slate-600">
-          Foundational mindsets and guidelines for project professionals. These principles are not prescriptive rules, but universal truths that guide behavior.
-        </p>
-      </header>
+      <PageHeader
+        number="§ I"
+        kicker="Foundations"
+        title="The Twelve Principles"
+        standfirst="Not prescriptive rules, but the mindsets a project professional is expected to reason from."
+        note="The seventh edition replaced process compliance with principled judgement. Every situational question on the exam is, underneath, asking which of these twelve applies."
+      />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-        {principles.map((principle, index) => {
-          const Icon = iconMap[principle.icon] || Shield;
-          return (
-            <motion.div
-              key={principle.id}
+      {/* A numbered reference list, two columns wide. */}
+      <ol className="grid grid-cols-1 md:grid-cols-2 gap-x-12 xl:gap-x-20 border-t border-rule-strong">
+        {principles.map((principle, index) => (
+          <li key={principle.id} className="border-b border-rule">
+            <motion.button
               layoutId={principle.id}
               onClick={() => setSelectedId(principle.id)}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="bg-white border border-slate-200 p-4 sm:p-6 rounded-xl sm:rounded-2xl cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group relative overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: index * 0.03 }}
+              className="group w-full text-left flex items-baseline gap-5 py-6 pr-2
+                         transition-colors hover:bg-[rgba(255,253,247,0.75)]"
             >
-              <div className="p-2.5 sm:p-3 rounded-lg sm:rounded-xl bg-purple-50 w-fit mb-3 sm:mb-4 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                <Icon size={20} className="sm:w-6 sm:h-6" />
-              </div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-1.5 sm:mb-2">{principle.title}</h3>
-              <p className="text-slate-500 text-xs sm:text-sm line-clamp-2">{principle.description}</p>
-            </motion.div>
-          );
-        })}
-      </div>
+              <span className="numeral text-sm font-semibold w-8 shrink-0 pt-1">
+                {ROMAN[index]}
+              </span>
+              <span className="min-w-0">
+                <span className="block font-display text-xl font-semibold text-ink
+                                 group-hover:text-lapis transition-colors leading-snug">
+                  {principle.title}
+                </span>
+                <span className="block font-text text-sm text-ink-muted leading-relaxed mt-1.5">
+                  {principle.description}
+                </span>
+              </span>
+            </motion.button>
+          </li>
+        ))}
+      </ol>
 
+      {/* Detail */}
       <AnimatePresence>
         {selectedId && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedId(null)}
-              className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm"
+              className="absolute inset-0 bg-ink/35"
             />
-            
+
             <motion.div
               layoutId={selectedId}
-              className="bg-white w-full max-w-2xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto"
+              className="plate w-full max-w-2xl relative z-10 max-h-[88vh] overflow-y-auto
+                         custom-scrollbar shadow-[0_18px_50px_-25px_rgba(26,24,21,0.5)]"
             >
-              <button
-                onClick={() => setSelectedId(null)}
-                className="absolute top-4 sm:top-6 right-4 sm:right-6 p-2 rounded-full bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-colors"
-              >
-                <X size={20} />
-              </button>
-
-              <div className="flex items-center gap-3 sm:gap-4 mb-5 sm:mb-6 pr-10">
-                <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-purple-100 text-purple-600 shrink-0">
-                  {(() => {
-                    const Icon = iconMap[selectedPrinciple.icon] || Shield;
-                    return <Icon size={24} className="sm:w-8 sm:h-8" />;
-                  })()}
-                </div>
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900">{selectedPrinciple.title}</h2>
-              </div>
-
-              <div className="space-y-4 sm:space-y-6">
-                <div>
-                  <h3 className="text-xs sm:text-sm font-bold text-purple-600 uppercase tracking-wider mb-2">Core Concept</h3>
-                  <p className="text-base sm:text-lg lg:text-xl text-slate-800 font-medium leading-relaxed">
-                    {selectedPrinciple.description}
-                  </p>
+              <div className="p-6 sm:p-10">
+                <div className="flex items-baseline justify-between gap-6 border-b border-rule pb-3 mb-7">
+                  <div className="flex items-baseline gap-4">
+                    <span className="numeral text-sm font-semibold">{ROMAN[selectedIndex]}</span>
+                    <span className="label">Principle</span>
+                  </div>
+                  <button
+                    onClick={() => setSelectedId(null)}
+                    aria-label="Close"
+                    className="text-ink-faint hover:text-ink transition-colors -mr-1"
+                  >
+                    <X size={20} />
+                  </button>
                 </div>
 
-                <div className="bg-slate-50 p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-100">
-                  <h3 className="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 sm:mb-3">Detailed Explanation</h3>
-                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                    {selectedPrinciple.details}
+                <h2 className="font-display text-3xl sm:text-[2.25rem] font-semibold text-ink leading-tight">
+                  {selected.title}
+                </h2>
+
+                <p className="font-display text-xl text-ink-soft italic leading-relaxed mt-5 measure">
+                  {selected.description}
+                </p>
+
+                <div className="mt-9 pt-6 border-t border-rule">
+                  <p className="label mb-3">In practice</p>
+                  <p className="font-text text-[15px] text-ink-soft leading-relaxed measure">
+                    {selected.details}
                   </p>
                 </div>
               </div>

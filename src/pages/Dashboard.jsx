@@ -1,124 +1,167 @@
-
-import React from 'react';
+﻿import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Play, BookOpen, Users, Settings, Briefcase } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
-const Dashboard = () => {
-  const studyCards = [
-    {
-      title: 'People Domain',
-      subtitle: 'Leadership, team management, and stakeholder engagement',
-      weight: '42%',
-      progress: 65,
-      color: 'red',
-      icon: Users,
-      path: '/principles', // Mapping Principles to "People" roughly for now
-      bg: 'bg-red-50',
-      text: 'text-red-600',
-      bar: 'bg-red-500'
-    },
-    {
-      title: 'Process Domain',
-      subtitle: 'Technical project management and methodologies',
-      weight: '50%',
-      progress: 45,
-      color: 'blue',
-      icon: Settings,
-      path: '/domains',
-      bg: 'bg-blue-50',
-      text: 'text-blue-600',
-      bar: 'bg-blue-500'
-    },
-    {
-      title: 'Business Environment',
-      subtitle: 'Strategic alignment and organizational context',
-      weight: '8%',
-      progress: 30,
-      color: 'green',
-      icon: Briefcase,
-      path: '/models-methods',
-      bg: 'bg-green-50',
-      text: 'text-green-600',
-      bar: 'bg-green-500'
-    }
-  ];
+const domains = [
+  {
+    n: 'I',
+    title: 'People',
+    subtitle: 'Leadership, team management, and stakeholder engagement',
+    gloss: 'The soft skills the exam treats as hard requirements — coaching, conflict, negotiation, and the servant-leader posture that runs underneath all of it.',
+    weight: 42,
+    progress: 65,
+    path: '/principles',
+  },
+  {
+    n: 'II',
+    title: 'Process',
+    subtitle: 'Technical project management and methodologies',
+    gloss: 'Half the paper. Predictive, agile and hybrid delivery: planning, execution, measurement, and the tailoring decisions between them.',
+    weight: 50,
+    progress: 45,
+    path: '/domains',
+  },
+  {
+    n: 'III',
+    title: 'Business Environment',
+    subtitle: 'Strategic alignment and organizational context',
+    gloss: 'The smallest domain and the most often underprepared — compliance, benefits realisation, and the value the project is meant to return.',
+    weight: 8,
+    progress: 30,
+    path: '/models-methods',
+  },
+];
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      {/* Hero Section */}
-      <div className="text-center py-10 sm:py-16 md:py-20">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4 sm:mb-6 tracking-tight px-2">
-          Master PMP <span className="text-purple-600">7th Edition</span>
-        </h1>
-        <p className="text-base sm:text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-8 sm:mb-10 px-4">
-          Comprehensive study guide covering all three exam domains: People (42%), Process (50%), and Business Environment (8%)
-        </p>
-        <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4">
-          <Link to="/domains" className="btn-primary">
-            <Play size={20} fill="currentColor" />
-            Start Studying
-          </Link>
-          <Link to="/domains" className="btn-secondary">
-            <BookOpen size={20} />
-            View Domains
-          </Link>
-        </div>
+const Dashboard = () => (
+  <motion.div
+    initial={{ opacity: 0, y: 12 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.45, ease: 'easeOut' }}
+  >
+    {/* ---------------------------------------------------------------- Hero */}
+    <section className="border-t-2 border-ink pt-4">
+      <div className="flex items-baseline gap-4 mb-10">
+        <span className="numeral text-sm font-semibold">§</span>
+        <span className="label">Project Management Professional</span>
       </div>
 
-      {/* Dashboard Grid */}
-      <div className="mt-8 sm:mt-12">
-        <div className="text-center mb-8 sm:mb-10">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Your Study Dashboard</h2>
-          <p className="text-sm sm:text-base text-slate-500 mt-2">Track your progress across all PMP exam domains</p>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-10 gap-y-10 items-start">
+        <div className="lg:col-span-7">
+          <h1 className="font-display text-[2.5rem] sm:text-[3.25rem] xl:text-[3.75rem] font-semibold
+                         leading-[1.06] tracking-[-0.015em] text-ink text-balance">
+            A study manual for the seventh edition
+          </h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-          {studyCards.map((card, index) => (
-            <Link to={card.path} key={index} className="group">
-              <motion.div
-                whileHover={{ y: -5 }}
-                className={`h-full p-5 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 bg-white relative overflow-hidden`}
-              >
-                <div className={`absolute top-0 left-0 w-full h-1 ${card.bg}`}></div>
+          <p className="page-standfirst mt-7">
+            Principles, performance domains, the predictive process grid, and the
+            agile practices the current exam actually asks about — set out to be
+            read rather than skimmed.
+          </p>
 
-                <div className="flex justify-between items-start mb-4 sm:mb-6">
-                  <div className={`p-2.5 sm:p-3 rounded-lg sm:rounded-xl ${card.bg} ${card.text}`}>
-                    <card.icon size={20} className="sm:w-6 sm:h-6" />
-                  </div>
-                  <div className="text-right">
-                    <span className={`text-base sm:text-lg font-bold ${card.text}`}>{card.weight}</span>
-                    <p className="text-xs text-slate-400 font-medium uppercase tracking-wide">Exam Weight</p>
-                  </div>
-                </div>
-
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-1.5 sm:mb-2 group-hover:text-purple-600 transition-colors">
-                  {card.title}
-                </h3>
-                <p className="text-slate-500 text-xs sm:text-sm mb-6 sm:mb-8 min-h-[32px] sm:min-h-[40px]">
-                  {card.subtitle}
-                </p>
-
-                <div className="mt-auto">
-                  <div className="w-full bg-slate-100 rounded-full h-1.5 sm:h-2 mb-2">
-                    <div
-                      className={`h-1.5 sm:h-2 rounded-full ${card.bar}`}
-                      style={{ width: `${card.progress}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-xs text-slate-400 font-medium">{card.progress}% Complete</p>
-                </div>
-              </motion.div>
+          <div className="flex flex-wrap gap-3 mt-9">
+            <Link to="/domains" className="btn-primary">
+              Begin <ArrowRight size={15} strokeWidth={2.2} />
             </Link>
-          ))}
+            <Link to="/exam-prep" className="btn-secondary">
+              Exam Preparation
+            </Link>
+          </div>
+        </div>
+
+        {/* Weights, as a small table set into the margin */}
+        <div className="lg:col-span-4 lg:col-start-9 lg:border-l lg:border-rule lg:pl-8">
+          <p className="label border-b border-rule pb-2 mb-4">Examination weights</p>
+          <dl className="space-y-0">
+            {domains.map((d) => (
+              <div key={d.n} className="flex items-baseline justify-between gap-4 py-2.5
+                                        border-b border-rule last:border-b-0">
+                <dt className="font-display text-base text-ink-soft">{d.title}</dt>
+                <dd className="figure font-display text-lg font-semibold text-ink">
+                  {d.weight}<span className="text-ink-faint text-sm">%</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <p className="font-text text-xs text-ink-faint mt-4 leading-relaxed">
+            Percentages are the proportion of scored questions drawn from each
+            performance domain.
+          </p>
         </div>
       </div>
-    </motion.div>
-  );
-};
+    </section>
+
+    {/* ------------------------------------------------------------ Contents */}
+    <section className="mt-20 sm:mt-28">
+      <div className="flex items-baseline justify-between gap-6 border-t border-rule-strong pt-4 mb-2">
+        <h2 className="font-display text-2xl font-semibold text-ink">Contents</h2>
+        <span className="label text-ink-faint">Three domains</span>
+      </div>
+
+      <ol>
+        {domains.map((d) => (
+          <li key={d.n}>
+            <Link
+              to={d.path}
+              className="group grid grid-cols-1 lg:grid-cols-12 gap-x-10 gap-y-4 items-start
+                         border-b border-rule py-8 sm:py-10 transition-colors
+                         hover:bg-[rgba(255,253,247,0.7)]"
+            >
+              {/* Numeral */}
+              <div className="lg:col-span-1">
+                <span className="numeral text-2xl font-semibold">{d.n}</span>
+              </div>
+
+              {/* Title + gloss */}
+              <div className="lg:col-span-6">
+                <h3 className="font-display text-2xl sm:text-[1.75rem] font-semibold text-ink
+                               group-hover:text-lapis transition-colors leading-snug">
+                  {d.title}
+                </h3>
+                <p className="font-display text-ink-muted italic mt-1.5">{d.subtitle}</p>
+                <p className="font-text text-[15px] text-ink-soft leading-relaxed mt-4 measure">
+                  {d.gloss}
+                </p>
+              </div>
+
+              {/* Weight */}
+              <div className="lg:col-span-2 lg:text-right">
+                <span className="label block mb-1">Weight</span>
+                <span className="figure font-display text-4xl font-semibold text-ink leading-none">
+                  {d.weight}
+                  <span className="text-lg text-ink-faint">%</span>
+                </span>
+              </div>
+
+              {/* Progress */}
+              <div className="lg:col-span-3">
+                <div className="flex items-baseline justify-between mb-2">
+                  <span className="label">Studied</span>
+                  <span className="figure font-text text-sm font-semibold text-ink-soft">
+                    {d.progress}%
+                  </span>
+                </div>
+                <div className="h-px w-full bg-rule-strong relative">
+                  <div
+                    className="absolute inset-y-0 left-0 h-px bg-lapis"
+                    style={{ width: `${d.progress}%` }}
+                  />
+                  <div
+                    className="absolute -top-[3px] h-[7px] w-px bg-lapis"
+                    style={{ left: `${d.progress}%` }}
+                  />
+                </div>
+                <span className="hidden lg:flex items-center gap-1.5 label-accent mt-5
+                                 opacity-0 group-hover:opacity-100 transition-opacity">
+                  Read <ArrowRight size={13} strokeWidth={2.2} />
+                </span>
+              </div>
+            </Link>
+          </li>
+        ))}
+      </ol>
+    </section>
+  </motion.div>
+);
 
 export default Dashboard;

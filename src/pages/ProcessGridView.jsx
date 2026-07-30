@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { pmbok6Data } from '../pmbok6Data';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowRight, Layers, Settings, FileText, Database } from 'lucide-react';
+import { X } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 
 const ProcessGridView = () => {
   const [selectedProcess, setSelectedProcess] = useState(null);
 
   const processGroups = [
-    "1. Initiating", "2. Planning", "3. Executing", "4. Monitoring & Controlling", "5. Closing"
+    "Initiating", "Planning", "Executing", "Monitoring & Controlling", "Closing"
   ];
 
   const knowledgeAreas = [
@@ -91,141 +92,151 @@ const ProcessGridView = () => {
 
   return (
     <div>
-      <header className="mb-6 sm:mb-10">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-2 sm:mb-4">
-          Predictive <span className="text-purple-600">Process Grid</span>
-        </h1>
-        <p className="text-sm sm:text-base text-slate-600 max-w-3xl">
-          The PMBOK 6th Edition framework. Click any process to explore its Inputs, Tools & Techniques, and Outputs (ITTOs).
-        </p>
-      </header>
+      <PageHeader
+        number="§ IV"
+        kicker="Predictive"
+        title="The Process Grid"
+        standfirst="Forty-nine processes, set against ten knowledge areas and five process groups."
+        note="Carried over from the sixth edition. The current exam no longer tests the grid directly, but it remains the clearest map of predictive delivery. Any process opens to its inputs, tools and outputs."
+      />
 
-      <div className="overflow-x-auto pb-4 sm:pb-8 -mx-4 px-4 sm:mx-0 sm:px-0">
-        <div className="min-w-[900px] sm:min-w-[1200px] bg-white rounded-lg sm:rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          {/* Header Row */}
-          <div className="grid grid-cols-[200px_repeat(5,1fr)] bg-slate-800 text-white font-bold text-sm uppercase tracking-wider">
-            <div className="p-4 border-r border-slate-700 flex items-center justify-center bg-white text-slate-900 border-b border-slate-200">
-              Knowledge Areas
-            </div>
-            {processGroups.map((group, i) => (
-              <div key={i} className="p-4 text-center border-r border-slate-700 last:border-r-0 flex items-center justify-center">
-                {group}
-              </div>
-            ))}
-          </div>
+      <div className="overflow-x-auto pb-6 -mx-4 px-4 sm:mx-0 sm:px-0 custom-scrollbar">
+        <table className="min-w-[1000px] w-full border-collapse text-left">
+          <thead>
+            <tr className="border-y-2 border-ink">
+              <th scope="col" className="label align-bottom py-3 pr-6 w-[190px]">
+                Knowledge area
+              </th>
+              {processGroups.map((group, i) => (
+                <th key={i} scope="col" className="align-bottom py-3 px-3 w-[calc((100%-190px)/5)]">
+                  <span className="numeral text-[11px] font-semibold block mb-1">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span className="label block leading-snug">{group}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
 
-          {/* Grid Content */}
-          {knowledgeAreas.map((area, i) => (
-            <div key={area.id} className="grid grid-cols-[200px_repeat(5,1fr)] border-b border-slate-100 last:border-b-0 hover:bg-slate-50 transition-colors">
-              {/* Knowledge Area Header */}
-              <div className="p-4 font-bold text-slate-700 text-sm bg-slate-50 border-r border-slate-200 flex items-center">
-                {area.title}
-              </div>
+          <tbody>
+            {knowledgeAreas.map((area) => {
+              const [num, ...rest] = area.title.split('. ');
+              return (
+                <tr key={area.id} className="border-b border-rule align-top">
+                  <th scope="row" className="py-5 pr-6 font-normal">
+                    <span className="flex items-baseline gap-3">
+                      <span className="numeral text-[11px] font-semibold shrink-0">
+                        {num.padStart(2, '0')}
+                      </span>
+                      <span className="font-display text-[15px] font-semibold text-ink leading-snug">
+                        {rest.join('. ')}
+                      </span>
+                    </span>
+                  </th>
 
-              {/* Process Cells */}
-              {[0, 1, 2, 3, 4].map((groupId) => {
-                const processes = area.processes.filter(p => p.group === groupId);
-                return (
-                  <div key={groupId} className="p-3 border-r border-slate-100 last:border-r-0 flex flex-col gap-2">
-                    {processes.map((process) => (
-                      <button
-                        key={process.id}
-                        onClick={() => handleProcessClick(process.id)}
-                        className="text-left text-xs font-medium p-2 rounded-lg bg-purple-50 text-purple-700 border border-purple-100 hover:bg-purple-600 hover:text-white hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
-                      >
-                        {process.name}
-                      </button>
-                    ))}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-        </div>
+                  {[0, 1, 2, 3, 4].map((groupId) => {
+                    const processes = area.processes.filter((p) => p.group === groupId);
+                    return (
+                      <td key={groupId} className="py-5 px-3 border-l border-rule">
+                        <ul className="space-y-2.5">
+                          {processes.map((process) => {
+                            const [ref, ...label] = process.name.split(' ');
+                            return (
+                              <li key={process.id}>
+                                <button
+                                  onClick={() => handleProcessClick(process.id)}
+                                  className="group text-left flex items-baseline gap-2 w-full"
+                                >
+                                  <span className="figure font-text text-[10px] font-semibold
+                                                   text-ink-faint shrink-0 pt-px
+                                                   group-hover:text-saffron transition-colors">
+                                    {ref}
+                                  </span>
+                                  <span className="font-text text-[13px] leading-snug text-ink-soft
+                                                   border-b border-transparent
+                                                   group-hover:text-lapis group-hover:border-lapis
+                                                   transition-colors">
+                                    {label.join(' ')}
+                                  </span>
+                                </button>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
 
-      {/* Modal */}
+      {/* ITTOs */}
       <AnimatePresence>
         {selectedProcess && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedProcess(null)}
-              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-ink/35"
             />
-            
+
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white w-full max-w-4xl max-h-[90vh] rounded-xl sm:rounded-2xl shadow-2xl relative z-10 flex flex-col overflow-hidden"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 14 }}
+              transition={{ duration: 0.22 }}
+              className="plate w-full max-w-4xl max-h-[88vh] relative z-10 flex flex-col
+                         shadow-[0_18px_50px_-25px_rgba(26,24,21,0.5)]"
             >
-              {/* Modal Header */}
-              <div className="p-4 sm:p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50 shrink-0">
-                <div className="pr-10">
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">{selectedProcess.title}</h2>
-                  <p className="text-slate-500 text-xs sm:text-sm mt-1">Process Details & ITTOs</p>
+              <div className="px-6 sm:px-10 pt-7 pb-5 border-b border-rule-strong shrink-0">
+                <div className="flex items-baseline justify-between gap-6 mb-3">
+                  <span className="label">Inputs · Tools &amp; Techniques · Outputs</span>
+                  <button
+                    onClick={() => setSelectedProcess(null)}
+                    aria-label="Close"
+                    className="text-ink-faint hover:text-ink transition-colors -mr-1"
+                  >
+                    <X size={20} />
+                  </button>
                 </div>
-                <button
-                  onClick={() => setSelectedProcess(null)}
-                  className="p-2 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors absolute top-4 right-4 sm:static"
-                >
-                  <X size={22} />
-                </button>
+                <h2 className="font-display text-2xl sm:text-[2rem] font-semibold text-ink leading-tight">
+                  {selectedProcess.title}
+                </h2>
               </div>
 
-              {/* Modal Body */}
-              <div className="p-4 sm:p-6 overflow-y-auto custom-scrollbar">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                  {/* Inputs */}
-                  <div className="bg-blue-50 rounded-lg sm:rounded-xl border border-blue-100 overflow-hidden">
-                    <div className="bg-blue-100/50 p-3 sm:p-4 border-b border-blue-100 flex items-center gap-2">
-                      <Database size={16} className="sm:w-[18px] sm:h-[18px] text-blue-600" />
-                      <h3 className="font-bold text-sm sm:text-base text-blue-800">Inputs</h3>
-                    </div>
-                    <ul className="p-3 sm:p-4 space-y-2 sm:space-y-3">
-                      {selectedProcess.inputs.map((item, i) => (
-                        <li key={i} className="text-xs sm:text-sm text-slate-700 flex items-start gap-2">
-                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0"></span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Tools */}
-                  <div className="bg-purple-50 rounded-lg sm:rounded-xl border border-purple-100 overflow-hidden">
-                    <div className="bg-purple-100/50 p-3 sm:p-4 border-b border-purple-100 flex items-center gap-2">
-                      <Settings size={16} className="sm:w-[18px] sm:h-[18px] text-purple-600" />
-                      <h3 className="font-bold text-sm sm:text-base text-purple-800">Tools & Techniques</h3>
-                    </div>
-                    <ul className="p-3 sm:p-4 space-y-2 sm:space-y-3">
-                      {selectedProcess.tools.map((item, i) => (
-                        <li key={i} className="text-xs sm:text-sm text-slate-700 flex items-start gap-2">
-                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-purple-400 shrink-0"></span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Outputs */}
-                  <div className="bg-green-50 rounded-lg sm:rounded-xl border border-green-100 overflow-hidden sm:col-span-2 lg:col-span-1">
-                    <div className="bg-green-100/50 p-3 sm:p-4 border-b border-green-100 flex items-center gap-2">
-                      <FileText size={16} className="sm:w-[18px] sm:h-[18px] text-green-600" />
-                      <h3 className="font-bold text-sm sm:text-base text-green-800">Outputs</h3>
-                    </div>
-                    <ul className="p-3 sm:p-4 space-y-2 sm:space-y-3">
-                      {selectedProcess.outputs.map((item, i) => (
-                        <li key={i} className="text-xs sm:text-sm text-slate-700 flex items-start gap-2">
-                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-green-400 shrink-0"></span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+              <div className="px-6 sm:px-10 py-8 overflow-y-auto custom-scrollbar">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-10">
+                  {[
+                    { head: 'Inputs', items: selectedProcess.inputs, mark: 'text-ink-faint', rule: 'border-rule-strong' },
+                    { head: 'Tools & Techniques', items: selectedProcess.tools, mark: 'text-lapis', rule: 'border-lapis/40' },
+                    { head: 'Outputs', items: selectedProcess.outputs, mark: 'text-saffron', rule: 'border-saffron/40' },
+                  ].map((column) => (
+                    <section key={column.head}>
+                      <h3 className={`label border-b-2 ${column.rule} pb-2 mb-1 ${column.mark}`}>
+                        {column.head}
+                      </h3>
+                      <ul>
+                        {column.items.map((item, i) => (
+                          <li
+                            key={i}
+                            className="flex items-baseline gap-3 py-2.5 border-b border-rule"
+                          >
+                            <span className={`figure text-[10px] font-text font-semibold shrink-0 w-3.5 ${column.mark}`}>
+                              {i + 1}
+                            </span>
+                            <span className="font-text text-[13.5px] text-ink-soft leading-relaxed">
+                              {item}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  ))}
                 </div>
               </div>
             </motion.div>

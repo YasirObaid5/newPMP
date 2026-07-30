@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-    Repeat, GitBranch, Layout, Zap, TrendingUp, Layers,
-    ChevronDown, ChevronRight, Users, Calendar, Target,
-    CheckCircle, Clock, MessageCircle, Settings, BarChart2,
-    Clipboard, ArrowRight, BookOpen, Award
-} from 'lucide-react';
+import { ChevronDown, ChevronRight, ArrowRight } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 
 import {
     agileFrameworks,
@@ -15,20 +11,58 @@ import {
     servantLeadership
 } from '../agileData';
 
-const iconMap = {
-    Repeat, GitBranch, Layout, Zap, TrendingUp, Layers,
-    Users, Calendar, Target, CheckCircle, Clock, MessageCircle,
-    Settings, BarChart2, Clipboard, Award
-};
+const pad = (n) => String(n).padStart(2, '0');
 
-const colorClasses = {
-    blue: { bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-200', badge: 'bg-blue-100' },
-    purple: { bg: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-200', badge: 'bg-purple-100' },
-    yellow: { bg: 'bg-yellow-50', text: 'text-yellow-600', border: 'border-yellow-200', badge: 'bg-yellow-100' },
-    green: { bg: 'bg-green-50', text: 'text-green-600', border: 'border-green-200', badge: 'bg-green-100' },
-    indigo: { bg: 'bg-indigo-50', text: 'text-indigo-600', border: 'border-indigo-200', badge: 'bg-indigo-100' },
-    red: { bg: 'bg-red-50', text: 'text-red-600', border: 'border-red-200', badge: 'bg-red-100' }
-};
+/* -------------------------------------------------------------------------
+   Shared furniture — a ruled subhead, and a ruled definition row.
+   ------------------------------------------------------------------------- */
+
+const Subhead = ({ children, count, accent = false }) => (
+    <div className={`flex items-baseline justify-between gap-4 border-b-2 pb-2 mb-1 ${
+        accent ? 'border-lapis/40' : 'border-rule-strong'
+    }`}>
+        <h3 className={accent ? 'label-accent' : 'label'}>{children}</h3>
+        {count != null && <span className="label figure text-ink-faint">{count}</span>}
+    </div>
+);
+
+const Term = ({ index, name, children, aside }) => (
+    <div className="flex items-baseline gap-4 py-4 border-b border-rule">
+        {index != null && (
+            <span className="numeral text-[11px] font-semibold shrink-0 w-5 pt-0.5">
+                {pad(index)}
+            </span>
+        )}
+        <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span className="font-display text-[17px] font-semibold text-ink leading-snug">
+                    {name}
+                </span>
+                {aside && <span className="label text-ink-faint">{aside}</span>}
+            </div>
+            {children && (
+                <div className="font-text text-[13.5px] text-ink-soft leading-relaxed mt-1.5">
+                    {children}
+                </div>
+            )}
+        </div>
+    </div>
+);
+
+/* A run of terms set inline — replaces the old coloured pill badges. */
+const TermRun = ({ items, ordered = false }) => (
+    <p className="font-text text-[13px] text-ink-muted leading-relaxed mt-2">
+        {items.map((item, i) => (
+            <React.Fragment key={i}>
+                {i > 0 && <span className="text-ink-faint"> · </span>}
+                {ordered && <span className="numeral text-[11px] font-semibold">{i + 1} </span>}
+                {item}
+            </React.Fragment>
+        ))}
+    </p>
+);
+
+/* -------------------------------------------------------------------------- */
 
 const AgileView = () => {
     const [activeTab, setActiveTab] = useState('frameworks');
@@ -36,641 +70,619 @@ const AgileView = () => {
     const [expandedSection, setExpandedSection] = useState({});
 
     const tabs = [
-        { id: 'frameworks', name: 'Frameworks', icon: GitBranch },
-        { id: 'practices', name: 'Practices', icon: Settings },
-        { id: 'roles', name: 'Roles', icon: Users },
-        { id: 'comparison', name: 'Agile vs Predictive', icon: BarChart2 },
-        { id: 'leadership', name: 'Servant Leadership', icon: Award }
+        { id: 'frameworks', name: 'Frameworks' },
+        { id: 'practices', name: 'Practices' },
+        { id: 'roles', name: 'Roles' },
+        { id: 'comparison', name: 'Agile vs Predictive' },
+        { id: 'leadership', name: 'Servant Leadership' }
     ];
 
-    const toggleSection = (section) => {
-        setExpandedSection(prev => ({
-            ...prev,
-            [section]: !prev[section]
-        }));
-    };
+    const toggleSection = (section) =>
+        setExpandedSection((prev) => ({ ...prev, [section]: !prev[section] }));
 
-    const renderFrameworks = () => (
-        <div className="space-y-6">
-            <div className="flex flex-wrap gap-3 mb-8">
-                {agileFrameworks.map(framework => {
-                    const colors = colorClasses[framework.color];
-                    return (
-                        <button
-                            key={framework.id}
-                            onClick={() => setExpandedFramework(framework.id)}
-                            className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                                expandedFramework === framework.id
-                                    ? `${colors.bg} ${colors.text} ${colors.border} border-2`
-                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                            }`}
-                        >
-                            {framework.name}
-                        </button>
-                    );
-                })}
-            </div>
-
-            {agileFrameworks.map(framework => {
-                if (framework.id !== expandedFramework) return null;
-                const colors = colorClasses[framework.color];
-                const IconComponent = iconMap[framework.icon] || GitBranch;
-
-                return (
+    const Disclosure = ({ id, children, summary }) => (
+        <div className="border-b border-rule">
+            <button
+                onClick={() => toggleSection(id)}
+                className="group w-full flex items-baseline justify-between gap-4 py-4 text-left row-link"
+            >
+                {summary}
+                <span className="text-ink-faint group-hover:text-lapis transition-colors shrink-0 self-center">
+                    {expandedSection[id] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </span>
+            </button>
+            <AnimatePresence initial={false}>
+                {expandedSection[id] && (
                     <motion.div
-                        key={framework.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="space-y-6"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.22 }}
+                        className="overflow-hidden"
                     >
-                        {/* Header */}
-                        <div className={`p-6 rounded-xl ${colors.bg} ${colors.border} border`}>
-                            <div className="flex items-start gap-4">
-                                <div className={`p-3 rounded-xl bg-white ${colors.text}`}>
-                                    <IconComponent size={28} />
-                                </div>
-                                <div>
-                                    <span className={`text-xs font-semibold uppercase tracking-wide ${colors.text}`}>
-                                        {framework.category}
-                                    </span>
-                                    <h2 className="text-2xl font-bold text-slate-900 mt-1">{framework.name}</h2>
-                                    <p className="text-slate-600 mt-2">{framework.description}</p>
-                                </div>
-                            </div>
+                        <div className="pb-6 pl-0 sm:pl-9 border-l-0 sm:border-l-2 sm:border-saffron/40 sm:ml-1">
+                            {children}
                         </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
 
-                        {/* Principles */}
-                        {framework.principles && (
-                            <div className="bg-white rounded-xl p-6 border border-slate-200">
-                                <h3 className="text-lg font-bold text-slate-900 mb-4">Core Principles</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    {framework.principles.map((principle, idx) => (
-                                        <div key={idx} className="flex items-start gap-3">
-                                            <CheckCircle className={`${colors.text} flex-shrink-0 mt-0.5`} size={18} />
-                                            <span className="text-slate-700">{principle}</span>
-                                        </div>
-                                    ))}
+    /* ---------------------------------------------------------- Frameworks */
+
+    const renderFrameworks = () => {
+        const framework = agileFrameworks.find((f) => f.id === expandedFramework);
+
+        return (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-8">
+                {/* Framework index */}
+                <nav className="lg:col-span-3">
+                    <p className="label border-b border-rule pb-2 mb-1 hidden lg:block">Frameworks</p>
+                    <div className="flex lg:flex-col overflow-x-auto lg:overflow-visible
+                                    -mx-4 px-4 lg:mx-0 lg:px-0 custom-scrollbar
+                                    border-b lg:border-b-0 border-rule">
+                        {agileFrameworks.map((f, i) => (
+                            <button
+                                key={f.id}
+                                onClick={() => setExpandedFramework(f.id)}
+                                className={`flex items-baseline gap-3 shrink-0 lg:shrink text-left
+                                            whitespace-nowrap lg:whitespace-normal
+                                            px-3 lg:px-0 py-3 lg:border-b lg:border-rule transition-colors ${
+                                    expandedFramework === f.id
+                                        ? 'text-ink'
+                                        : 'text-ink-muted hover:text-ink-soft'
+                                }`}
+                            >
+                                <span className={`text-[10px] font-text font-semibold tabular-nums shrink-0 ${
+                                    expandedFramework === f.id ? 'text-saffron' : 'text-ink-faint'
+                                }`}>
+                                    {pad(i + 1)}
+                                </span>
+                                <span className="font-display text-[15px] font-semibold leading-snug">
+                                    {f.name}
+                                </span>
+                                {expandedFramework === f.id && (
+                                    <span className="hidden lg:block ml-auto w-4 h-px bg-lapis self-center" />
+                                )}
+                            </button>
+                        ))}
+                    </div>
+                </nav>
+
+                {/* Framework text */}
+                <div className="lg:col-span-9 lg:border-l lg:border-rule lg:pl-12">
+                    <AnimatePresence mode="wait">
+                        <motion.article
+                            key={framework.id}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.25 }}
+                            className="space-y-14"
+                        >
+                            <div>
+                                <div className="flex items-baseline gap-4 border-b border-rule-strong pb-3 mb-6">
+                                    <span className="numeral text-xs font-semibold">
+                                        {pad(agileFrameworks.findIndex((f) => f.id === framework.id) + 1)}
+                                    </span>
+                                    <span className="label">{framework.category}</span>
                                 </div>
+                                <h2 className="font-display text-3xl sm:text-[2.5rem] font-semibold text-ink leading-[1.08]">
+                                    {framework.name}
+                                </h2>
+                                <p className="page-standfirst mt-4">{framework.description}</p>
                             </div>
-                        )}
 
-                        {/* Scrum-specific sections */}
-                        {framework.id === 'scrum' && (
-                            <>
-                                {/* Roles */}
-                                <div className="bg-white rounded-xl p-6 border border-slate-200">
-                                    <h3 className="text-lg font-bold text-slate-900 mb-4">Scrum Roles</h3>
-                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                        {framework.roles.map((role, idx) => (
-                                            <div key={idx} className={`p-4 rounded-lg ${colors.bg} ${colors.border} border`}>
-                                                <h4 className={`font-semibold ${colors.text} mb-3`}>{role.name}</h4>
-                                                <ul className="space-y-2">
-                                                    {role.responsibilities.map((resp, ridx) => (
-                                                        <li key={ridx} className="text-sm text-slate-600 flex items-start gap-2">
-                                                            <span className={`w-1.5 h-1.5 rounded-full ${colors.text.replace('text-', 'bg-')} mt-1.5 flex-shrink-0`}></span>
-                                                            {resp}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
+                            {framework.principles && framework.id !== 'lean' && (
+                                <section>
+                                    <Subhead count={framework.principles.length}>Core principles</Subhead>
+                                    <ol className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
+                                        {framework.principles.map((principle, idx) => (
+                                            <li key={idx} className="flex items-baseline gap-4 py-3.5 border-b border-rule">
+                                                <span className="numeral text-[11px] font-semibold shrink-0 w-5">
+                                                    {pad(idx + 1)}
+                                                </span>
+                                                <span className="font-text text-[14px] text-ink-soft leading-relaxed">
+                                                    {principle}
+                                                </span>
+                                            </li>
                                         ))}
-                                    </div>
-                                </div>
+                                    </ol>
+                                </section>
+                            )}
 
-                                {/* Events */}
-                                <div className="bg-white rounded-xl p-6 border border-slate-200">
-                                    <h3 className="text-lg font-bold text-slate-900 mb-4">Scrum Events</h3>
-                                    <div className="space-y-4">
-                                        {framework.events.map((event, idx) => (
-                                            <div key={idx} className="border border-slate-200 rounded-lg overflow-hidden">
-                                                <button
-                                                    onClick={() => toggleSection(`event-${idx}`)}
-                                                    className="w-full p-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
-                                                >
-                                                    <div className="flex items-center gap-3">
-                                                        <Calendar className={colors.text} size={20} />
-                                                        <span className="font-semibold text-slate-900">{event.name}</span>
-                                                        <span className={`text-xs px-2 py-1 rounded-full ${colors.badge} ${colors.text}`}>
-                                                            {event.timeBox}
-                                                        </span>
-                                                    </div>
-                                                    {expandedSection[`event-${idx}`] ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-                                                </button>
-                                                <AnimatePresence>
-                                                    {expandedSection[`event-${idx}`] && (
-                                                        <motion.div
-                                                            initial={{ height: 0, opacity: 0 }}
-                                                            animate={{ height: 'auto', opacity: 1 }}
-                                                            exit={{ height: 0, opacity: 0 }}
-                                                            className="border-t border-slate-200"
-                                                        >
-                                                            <div className="p-4 bg-slate-50">
-                                                                <p className="text-slate-600 mb-3">{event.description}</p>
-                                                                <div className="flex flex-wrap gap-2">
-                                                                    {event.keyPoints.map((point, pidx) => (
-                                                                        <span key={pidx} className="text-xs px-2 py-1 bg-white border border-slate-200 rounded-md text-slate-600">
-                                                                            {point}
-                                                                        </span>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                        </motion.div>
-                                                    )}
-                                                </AnimatePresence>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Artifacts */}
-                                <div className="bg-white rounded-xl p-6 border border-slate-200">
-                                    <h3 className="text-lg font-bold text-slate-900 mb-4">Scrum Artifacts & Commitments</h3>
-                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                        {framework.artifacts.map((artifact, idx) => (
-                                            <div key={idx} className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                                                <h4 className="font-semibold text-slate-900 mb-2">{artifact.name}</h4>
-                                                <p className="text-sm text-slate-600 mb-3">{artifact.description}</p>
-                                                <div className={`text-xs px-2 py-1 rounded inline-block ${colors.badge} ${colors.text} font-medium`}>
-                                                    Commitment: {artifact.commitment}
-                                                </div>
-                                                <ul className="mt-3 space-y-1">
-                                                    {artifact.keyPoints.map((point, pidx) => (
-                                                        <li key={pidx} className="text-xs text-slate-500">• {point}</li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </>
-                        )}
-
-                        {/* Kanban-specific sections */}
-                        {framework.id === 'kanban' && framework.practices && (
-                            <div className="bg-white rounded-xl p-6 border border-slate-200">
-                                <h3 className="text-lg font-bold text-slate-900 mb-4">Kanban Practices</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {framework.practices.map((practice, idx) => (
-                                        <div key={idx} className={`p-4 rounded-lg ${colors.bg} ${colors.border} border`}>
-                                            <h4 className={`font-semibold ${colors.text} mb-2`}>{practice.name}</h4>
-                                            <p className="text-sm text-slate-600 mb-2">{practice.description}</p>
-                                            <p className="text-xs text-slate-500">{practice.details}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                                
-                                {framework.metrics && (
-                                    <div className="mt-6">
-                                        <h4 className="font-semibold text-slate-900 mb-3">Key Metrics</h4>
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                            {framework.metrics.map((metric, idx) => (
-                                                <div key={idx} className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                                                    <p className="font-medium text-slate-900 text-sm">{metric.name}</p>
-                                                    <p className="text-xs text-slate-500 mt-1">{metric.description}</p>
+                            {/* Scrum */}
+                            {framework.id === 'scrum' && (
+                                <>
+                                    <section>
+                                        <Subhead count={framework.roles.length} accent>Roles</Subhead>
+                                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-10">
+                                            {framework.roles.map((role, idx) => (
+                                                <div key={idx} className="py-5 border-b border-rule">
+                                                    <h4 className="font-display text-[17px] font-semibold text-ink mb-2.5">
+                                                        {role.name}
+                                                    </h4>
+                                                    <ul className="space-y-1.5">
+                                                        {role.responsibilities.map((resp, ridx) => (
+                                                            <li key={ridx} className="flex items-baseline gap-2.5
+                                                                                      font-text text-[13px] text-ink-soft leading-relaxed">
+                                                                <span className="text-saffron shrink-0">—</span>
+                                                                {resp}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
                                                 </div>
                                             ))}
                                         </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                                    </section>
 
-                        {/* XP-specific sections */}
-                        {framework.id === 'xp' && (
-                            <>
-                                <div className="bg-white rounded-xl p-6 border border-slate-200">
-                                    <h3 className="text-lg font-bold text-slate-900 mb-4">XP Values</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                                        {framework.values.map((value, idx) => (
-                                            <div key={idx} className={`p-4 rounded-lg ${colors.bg} ${colors.border} border text-center`}>
-                                                <h4 className={`font-semibold ${colors.text} mb-2`}>{value.name}</h4>
-                                                <p className="text-xs text-slate-600">{value.description}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                                <div className="bg-white rounded-xl p-6 border border-slate-200">
-                                    <h3 className="text-lg font-bold text-slate-900 mb-4">XP Practices</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                        {framework.practices.map((practice, idx) => (
-                                            <div key={idx} className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="font-medium text-slate-900 text-sm">{practice.name}</span>
-                                                    <span className={`text-xs px-2 py-0.5 rounded ${colors.badge} ${colors.text}`}>
-                                                        {practice.category}
-                                                    </span>
-                                                </div>
-                                                <p className="text-xs text-slate-500 mt-1">{practice.description}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </>
-                        )}
-
-                        {/* Lean-specific sections */}
-                        {framework.id === 'lean' && framework.principles && (
-                            <div className="space-y-4">
-                                {framework.principles.map((principle, idx) => (
-                                    <div key={idx} className="bg-white rounded-xl p-6 border border-slate-200">
-                                        <button
-                                            onClick={() => toggleSection(`lean-${idx}`)}
-                                            className="w-full flex items-center justify-between"
-                                        >
-                                            <h4 className={`font-semibold ${colors.text}`}>{principle.name}</h4>
-                                            {expandedSection[`lean-${idx}`] ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-                                        </button>
-                                        <p className="text-slate-600 text-sm mt-2">{principle.description}</p>
-                                        <AnimatePresence>
-                                            {expandedSection[`lean-${idx}`] && (
-                                                <motion.div
-                                                    initial={{ height: 0, opacity: 0 }}
-                                                    animate={{ height: 'auto', opacity: 1 }}
-                                                    exit={{ height: 0, opacity: 0 }}
-                                                    className="mt-4"
-                                                >
-                                                    {principle.wasteTypes && (
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                                            {principle.wasteTypes.map((waste, widx) => (
-                                                                <div key={widx} className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                                                                    <p className="font-medium text-red-700 text-sm">{waste.name}</p>
-                                                                    <p className="text-xs text-red-600">{waste.example}</p>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                    {principle.practices && (
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {principle.practices.map((practice, pidx) => (
-                                                                <span key={pidx} className={`text-xs px-2 py-1 rounded ${colors.badge} ${colors.text}`}>
-                                                                    {practice}
-                                                                </span>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        {/* SAFe-specific sections */}
-                        {framework.id === 'safe' && (
-                            <>
-                                <div className="bg-white rounded-xl p-6 border border-slate-200">
-                                    <h3 className="text-lg font-bold text-slate-900 mb-4">SAFe Levels</h3>
-                                    <div className="space-y-4">
-                                        {framework.levels.map((level, idx) => (
-                                            <div key={idx} className={`p-4 rounded-lg ${colors.bg} ${colors.border} border`}>
-                                                <h4 className={`font-semibold ${colors.text} mb-2`}>{level.name}</h4>
-                                                <p className="text-sm text-slate-600 mb-3">{level.description}</p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {level.components.map((comp, cidx) => (
-                                                        <span key={cidx} className="text-xs px-2 py-1 bg-white border border-slate-200 rounded text-slate-600">
-                                                            {comp}
+                                    <section>
+                                        <Subhead count={framework.events.length} accent>Events</Subhead>
+                                        {framework.events.map((event, idx) => (
+                                            <Disclosure
+                                                key={idx}
+                                                id={`event-${idx}`}
+                                                summary={
+                                                    <span className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                                                        <span className="numeral text-[11px] font-semibold w-5">{pad(idx + 1)}</span>
+                                                        <span className="font-display text-[17px] font-semibold text-ink">
+                                                            {event.name}
                                                         </span>
+                                                        <span className="label text-ink-faint">{event.timeBox}</span>
+                                                    </span>
+                                                }
+                                            >
+                                                <p className="font-text text-[14px] text-ink-soft leading-relaxed measure">
+                                                    {event.description}
+                                                </p>
+                                                <TermRun items={event.keyPoints} />
+                                            </Disclosure>
+                                        ))}
+                                    </section>
+
+                                    <section>
+                                        <Subhead count={framework.artifacts.length} accent>
+                                            Artifacts &amp; commitments
+                                        </Subhead>
+                                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-10">
+                                            {framework.artifacts.map((artifact, idx) => (
+                                                <div key={idx} className="py-5 border-b border-rule">
+                                                    <h4 className="font-display text-[17px] font-semibold text-ink">
+                                                        {artifact.name}
+                                                    </h4>
+                                                    <p className="label-accent mt-1.5">
+                                                        Commitment · {artifact.commitment}
+                                                    </p>
+                                                    <p className="font-text text-[13px] text-ink-soft leading-relaxed mt-2.5">
+                                                        {artifact.description}
+                                                    </p>
+                                                    <TermRun items={artifact.keyPoints} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                </>
+                            )}
+
+                            {/* Kanban */}
+                            {framework.id === 'kanban' && framework.practices && (
+                                <>
+                                    <section>
+                                        <Subhead count={framework.practices.length} accent>Practices</Subhead>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
+                                            {framework.practices.map((practice, idx) => (
+                                                <Term key={idx} index={idx + 1} name={practice.name}>
+                                                    {practice.description}
+                                                    {practice.details && (
+                                                        <span className="block text-ink-muted mt-1">{practice.details}</span>
+                                                    )}
+                                                </Term>
+                                            ))}
+                                        </div>
+                                    </section>
+
+                                    {framework.metrics && (
+                                        <section>
+                                            <Subhead count={framework.metrics.length}>Metrics</Subhead>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8">
+                                                {framework.metrics.map((metric, idx) => (
+                                                    <div key={idx} className="py-4 border-b border-rule">
+                                                        <p className="font-display text-[15px] font-semibold text-ink">
+                                                            {metric.name}
+                                                        </p>
+                                                        <p className="font-text text-[12.5px] text-ink-muted leading-relaxed mt-1">
+                                                            {metric.description}
+                                                        </p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </section>
+                                    )}
+                                </>
+                            )}
+
+                            {/* XP */}
+                            {framework.id === 'xp' && (
+                                <>
+                                    <section>
+                                        <Subhead count={framework.values.length} accent>Values</Subhead>
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-x-8">
+                                            {framework.values.map((value, idx) => (
+                                                <div key={idx} className="py-4 border-b border-rule">
+                                                    <p className="font-display text-[16px] font-semibold text-ink">
+                                                        {value.name}
+                                                    </p>
+                                                    <p className="font-text text-[12.5px] text-ink-muted leading-relaxed mt-1">
+                                                        {value.description}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+
+                                    <section>
+                                        <Subhead count={framework.practices.length}>Practices</Subhead>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-10">
+                                            {framework.practices.map((practice, idx) => (
+                                                <Term
+                                                    key={idx}
+                                                    name={practice.name}
+                                                    aside={practice.category}
+                                                >
+                                                    {practice.description}
+                                                </Term>
+                                            ))}
+                                        </div>
+                                    </section>
+                                </>
+                            )}
+
+                            {/* Lean */}
+                            {framework.id === 'lean' && framework.principles && (
+                                <section>
+                                    <Subhead count={framework.principles.length} accent>Principles</Subhead>
+                                    {framework.principles.map((principle, idx) => (
+                                        <Disclosure
+                                            key={idx}
+                                            id={`lean-${idx}`}
+                                            summary={
+                                                <span className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                                                    <span className="numeral text-[11px] font-semibold w-5">{pad(idx + 1)}</span>
+                                                    <span className="min-w-0">
+                                                        <span className="block font-display text-[17px] font-semibold text-ink">
+                                                            {principle.name}
+                                                        </span>
+                                                        <span className="block font-text text-[13px] text-ink-muted leading-relaxed mt-1">
+                                                            {principle.description}
+                                                        </span>
+                                                    </span>
+                                                </span>
+                                            }
+                                        >
+                                            {principle.wasteTypes && (
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10">
+                                                    {principle.wasteTypes.map((waste, widx) => (
+                                                        <div key={widx} className="py-3 border-b border-rule">
+                                                            <p className="font-display text-[15px] font-semibold text-ink">
+                                                                {waste.name}
+                                                            </p>
+                                                            <p className="font-text text-[12.5px] text-ink-muted italic mt-0.5">
+                                                                {waste.example}
+                                                            </p>
+                                                        </div>
                                                     ))}
                                                 </div>
-                                            </div>
+                                            )}
+                                            {principle.practices && <TermRun items={principle.practices} />}
+                                        </Disclosure>
+                                    ))}
+                                </section>
+                            )}
+
+                            {/* SAFe */}
+                            {framework.id === 'safe' && (
+                                <>
+                                    <section>
+                                        <Subhead count={framework.levels.length} accent>Levels</Subhead>
+                                        {framework.levels.map((level, idx) => (
+                                            <Term key={idx} index={idx + 1} name={level.name}>
+                                                {level.description}
+                                                <TermRun items={level.components} />
+                                            </Term>
                                         ))}
-                                    </div>
-                                </div>
-                                <div className="bg-white rounded-xl p-6 border border-slate-200">
-                                    <h3 className="text-lg font-bold text-slate-900 mb-4">SAFe Events</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {framework.events.map((event, idx) => (
-                                            <div key={idx} className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <h4 className="font-semibold text-slate-900">{event.name}</h4>
-                                                    <span className={`text-xs px-2 py-1 rounded ${colors.badge} ${colors.text}`}>
-                                                        {event.frequency}
-                                                    </span>
-                                                </div>
-                                                <p className="text-sm text-slate-600">{event.description}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </>
-                        )}
-                    </motion.div>
-                );
-            })}
-        </div>
-    );
+                                    </section>
+
+                                    <section>
+                                        <Subhead count={framework.events.length}>Events</Subhead>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
+                                            {framework.events.map((event, idx) => (
+                                                <Term key={idx} name={event.name} aside={event.frequency}>
+                                                    {event.description}
+                                                </Term>
+                                            ))}
+                                        </div>
+                                    </section>
+                                </>
+                            )}
+                        </motion.article>
+                    </AnimatePresence>
+                </div>
+            </div>
+        );
+    };
+
+    /* ----------------------------------------------------------- Practices */
 
     const renderPractices = () => (
-        <div className="space-y-6">
-            {agilePractices.map((category, catIdx) => {
-                const IconComponent = iconMap[category.icon] || Settings;
-                return (
-                    <div key={catIdx} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                        <button
-                            onClick={() => toggleSection(`practice-${catIdx}`)}
-                            className="w-full p-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 rounded-lg bg-purple-100 text-purple-600">
-                                    <IconComponent size={20} />
-                                </div>
-                                <span className="font-bold text-slate-900">{category.category}</span>
-                                <span className="text-sm text-slate-500">({category.items.length} items)</span>
-                            </div>
-                            {expandedSection[`practice-${catIdx}`] ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-                        </button>
-                        <AnimatePresence>
-                            {expandedSection[`practice-${catIdx}`] && (
-                                <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    className="border-t border-slate-200"
-                                >
-                                    <div className="p-4 space-y-4">
-                                        {category.items.map((item, idx) => (
-                                            <div key={idx} className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                                                <h4 className="font-semibold text-slate-900 mb-2">{item.name}</h4>
-                                                <p className="text-sm text-slate-600 mb-3">{item.description}</p>
-                                                
-                                                {item.format && (
-                                                    <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-700 font-mono">
-                                                        {item.format}
-                                                    </div>
-                                                )}
-                                                
-                                                {item.investCriteria && (
-                                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-3">
-                                                        {item.investCriteria.map((criteria, cidx) => (
-                                                            <div key={cidx} className="p-2 bg-white border border-slate-200 rounded text-center">
-                                                                <span className="font-bold text-purple-600">{criteria.letter}</span>
-                                                                <span className="text-xs text-slate-600"> - {criteria.meaning}</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                )}
+        <div>
+            {agilePractices.map((category, catIdx) => (
+                <Disclosure
+                    key={catIdx}
+                    id={`practice-${catIdx}`}
+                    summary={
+                        <span className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                            <span className="numeral text-xs font-semibold w-6">{pad(catIdx + 1)}</span>
+                            <span className="font-display text-xl font-semibold text-ink">
+                                {category.category}
+                            </span>
+                            <span className="label text-ink-faint figure">
+                                {category.items.length} entries
+                            </span>
+                        </span>
+                    }
+                >
+                    <div className="space-y-8 pt-2">
+                        {category.items.map((item, idx) => (
+                            <article key={idx}>
+                                <h4 className="font-display text-[17px] font-semibold text-ink">
+                                    {item.name}
+                                </h4>
+                                <p className="font-text text-[14px] text-ink-soft leading-relaxed mt-1.5 measure">
+                                    {item.description}
+                                </p>
 
-                                                {item.steps && (
-                                                    <div className="flex flex-wrap gap-2 mt-3">
-                                                        {item.steps.map((step, sidx) => (
-                                                            <span key={sidx} className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
-                                                                {sidx + 1}. {step}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                )}
+                                {item.format && (
+                                    <p className="font-text text-[13px] text-lapis border-l-2 border-lapis/40 pl-4 py-1 mt-3">
+                                        {item.format}
+                                    </p>
+                                )}
 
-                                                {item.cycle && (
-                                                    <div className="flex items-center gap-2 mt-3">
-                                                        {item.cycle.map((step, sidx) => (
-                                                            <React.Fragment key={sidx}>
-                                                                <span className={`text-xs px-2 py-1 rounded ${
-                                                                    step.includes('Red') ? 'bg-red-100 text-red-700' :
-                                                                    step.includes('Green') ? 'bg-green-100 text-green-700' :
-                                                                    'bg-blue-100 text-blue-700'
-                                                                }`}>
-                                                                    {step}
-                                                                </span>
-                                                                {sidx < item.cycle.length - 1 && <ArrowRight size={14} className="text-slate-400" />}
-                                                            </React.Fragment>
-                                                        ))}
-                                                    </div>
-                                                )}
+                                {item.investCriteria && (
+                                    <dl className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 mt-3">
+                                        {item.investCriteria.map((criteria, cidx) => (
+                                            <div key={cidx} className="flex items-baseline gap-2.5 py-2 border-b border-rule">
+                                                <dt className="numeral text-base font-semibold">{criteria.letter}</dt>
+                                                <dd className="font-text text-[12.5px] text-ink-soft">{criteria.meaning}</dd>
+                                            </div>
+                                        ))}
+                                    </dl>
+                                )}
 
-                                                {item.formats && (
-                                                    <div className="grid grid-cols-2 gap-2 mt-3">
-                                                        {item.formats.map((format, fidx) => (
-                                                            <div key={fidx} className="p-2 bg-white border border-slate-200 rounded">
-                                                                <p className="font-medium text-slate-900 text-sm">{format.name}</p>
-                                                                <p className="text-xs text-slate-500">{format.description}</p>
-                                                            </div>
-                                                        ))}
-                                                    </div>
+                                {item.steps && <TermRun items={item.steps} ordered />}
+                                {item.cycle && (
+                                    <p className="flex flex-wrap items-center gap-2 font-text text-[13px] text-ink-soft mt-3">
+                                        {item.cycle.map((step, sidx) => (
+                                            <React.Fragment key={sidx}>
+                                                <span>{step}</span>
+                                                {sidx < item.cycle.length - 1 && (
+                                                    <ArrowRight size={12} className="text-saffron" />
                                                 )}
+                                            </React.Fragment>
+                                        ))}
+                                    </p>
+                                )}
+
+                                {item.formats && (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 mt-3">
+                                        {item.formats.map((format, fidx) => (
+                                            <div key={fidx} className="py-2.5 border-b border-rule">
+                                                <p className="font-display text-[14px] font-semibold text-ink">
+                                                    {format.name}
+                                                </p>
+                                                <p className="font-text text-[12.5px] text-ink-muted">
+                                                    {format.description}
+                                                </p>
                                             </div>
                                         ))}
                                     </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                                )}
+                            </article>
+                        ))}
                     </div>
-                );
-            })}
-        </div>
-    );
-
-    const renderRoles = () => (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {agileRoles.map((role, idx) => (
-                <div key={idx} className="bg-white rounded-xl p-6 border border-slate-200">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
-                            <Users size={20} />
-                        </div>
-                        <div>
-                            <h3 className="font-bold text-slate-900">{role.name}</h3>
-                            <span className="text-xs text-slate-500">{role.framework}</span>
-                        </div>
-                    </div>
-
-                    <div className="mb-4">
-                        <h4 className="text-sm font-semibold text-slate-700 mb-2">Responsibilities</h4>
-                        <ul className="space-y-1">
-                            {role.responsibilities.map((resp, ridx) => (
-                                <li key={ridx} className="text-sm text-slate-600 flex items-start gap-2">
-                                    <CheckCircle className="text-green-500 flex-shrink-0 mt-0.5" size={14} />
-                                    {resp}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    <div className="mb-4">
-                        <h4 className="text-sm font-semibold text-slate-700 mb-2">Key Skills</h4>
-                        <div className="flex flex-wrap gap-2">
-                            {role.skills.map((skill, sidx) => (
-                                <span key={sidx} className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded">
-                                    {skill}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-
-                    {role.antiPatterns && (
-                        <div>
-                            <h4 className="text-sm font-semibold text-slate-700 mb-2">Anti-Patterns to Avoid</h4>
-                            <div className="flex flex-wrap gap-2">
-                                {role.antiPatterns.map((pattern, pidx) => (
-                                    <span key={pidx} className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded">
-                                        {pattern}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
+                </Disclosure>
             ))}
         </div>
     );
 
+    /* --------------------------------------------------------------- Roles */
+
+    const renderRoles = () => (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-14 border-t border-rule-strong">
+            {agileRoles.map((role, idx) => (
+                <article key={idx} className="py-8 border-b border-rule">
+                    <div className="flex items-baseline gap-4 mb-5">
+                        <span className="numeral text-xs font-semibold w-5">{pad(idx + 1)}</span>
+                        <div>
+                            <h3 className="font-display text-2xl font-semibold text-ink leading-tight">
+                                {role.name}
+                            </h3>
+                            <p className="label text-ink-faint mt-1">{role.framework}</p>
+                        </div>
+                    </div>
+
+                    <div className="sm:pl-9 space-y-5">
+                        <div>
+                            <p className="label border-b border-rule pb-1.5 mb-2">Responsibilities</p>
+                            <ul className="space-y-1.5">
+                                {role.responsibilities.map((resp, ridx) => (
+                                    <li key={ridx} className="flex items-baseline gap-2.5
+                                                              font-text text-[13.5px] text-ink-soft leading-relaxed">
+                                        <span className="text-lapis shrink-0">—</span>
+                                        {resp}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        <div>
+                            <p className="label border-b border-rule pb-1.5 mb-1">Key skills</p>
+                            <TermRun items={role.skills} />
+                        </div>
+
+                        {role.antiPatterns && (
+                            <div>
+                                <p className="label border-b border-rule pb-1.5 mb-1 text-saffron">
+                                    Anti-patterns to avoid
+                                </p>
+                                <TermRun items={role.antiPatterns} />
+                            </div>
+                        )}
+                    </div>
+                </article>
+            ))}
+        </div>
+    );
+
+    /* ---------------------------------------------------------- Comparison */
+
     const renderComparison = () => (
-        <div className="space-y-6">
-            <div className="bg-white rounded-xl p-6 border border-slate-200">
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{agileVsPredictive.title}</h3>
-                <p className="text-slate-600 mb-6">{agileVsPredictive.description}</p>
-                
-                <div className="overflow-x-auto">
-                    <table className="w-full">
+        <div className="space-y-16">
+            <section>
+                <h3 className="font-display text-2xl font-semibold text-ink">
+                    {agileVsPredictive.title}
+                </h3>
+                <p className="font-text text-[15px] text-ink-soft leading-relaxed mt-2 measure">
+                    {agileVsPredictive.description}
+                </p>
+
+                <div className="overflow-x-auto mt-8 custom-scrollbar">
+                    <table className="w-full min-w-[640px] border-collapse text-left">
                         <thead>
-                            <tr className="border-b border-slate-200">
-                                <th className="text-left py-3 px-4 font-semibold text-slate-700">Aspect</th>
-                                <th className="text-left py-3 px-4 font-semibold text-blue-600 bg-blue-50">Agile</th>
-                                <th className="text-left py-3 px-4 font-semibold text-green-600 bg-green-50">Predictive</th>
+                            <tr className="border-y-2 border-ink">
+                                <th scope="col" className="label py-3 pr-6 w-1/4">Aspect</th>
+                                <th scope="col" className="label-accent py-3 px-6 w-[37.5%]">Agile</th>
+                                <th scope="col" className="label py-3 pl-6 w-[37.5%] text-saffron">Predictive</th>
                             </tr>
                         </thead>
                         <tbody>
                             {agileVsPredictive.comparison.map((row, idx) => (
-                                <tr key={idx} className="border-b border-slate-100">
-                                    <td className="py-3 px-4 font-medium text-slate-900">{row.aspect}</td>
-                                    <td className="py-3 px-4 text-sm text-slate-600 bg-blue-50/50">{row.agile}</td>
-                                    <td className="py-3 px-4 text-sm text-slate-600 bg-green-50/50">{row.predictive}</td>
+                                <tr key={idx} className="border-b border-rule align-top">
+                                    <th scope="row" className="py-4 pr-6 font-display text-[15px] font-semibold text-ink text-left">
+                                        {row.aspect}
+                                    </th>
+                                    <td className="py-4 px-6 font-text text-[13.5px] text-ink-soft leading-relaxed border-l border-rule">
+                                        {row.agile}
+                                    </td>
+                                    <td className="py-4 pl-6 font-text text-[13.5px] text-ink-soft leading-relaxed border-l border-rule">
+                                        {row.predictive}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </section>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
-                    <h4 className="font-bold text-blue-700 mb-4">When to Use Agile</h4>
-                    <ul className="space-y-2">
-                        {agileVsPredictive.whenToUse.agile.map((item, idx) => (
-                            <li key={idx} className="text-sm text-blue-700 flex items-start gap-2">
-                                <CheckCircle className="flex-shrink-0 mt-0.5" size={14} />
-                                {item}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
-                <div className="bg-green-50 rounded-xl p-6 border border-green-200">
-                    <h4 className="font-bold text-green-700 mb-4">When to Use Predictive</h4>
-                    <ul className="space-y-2">
-                        {agileVsPredictive.whenToUse.predictive.map((item, idx) => (
-                            <li key={idx} className="text-sm text-green-700 flex items-start gap-2">
-                                <CheckCircle className="flex-shrink-0 mt-0.5" size={14} />
-                                {item}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
-                <div className="bg-purple-50 rounded-xl p-6 border border-purple-200">
-                    <h4 className="font-bold text-purple-700 mb-4">When to Use Hybrid</h4>
-                    <ul className="space-y-2">
-                        {agileVsPredictive.whenToUse.hybrid.map((item, idx) => (
-                            <li key={idx} className="text-sm text-purple-700 flex items-start gap-2">
-                                <CheckCircle className="flex-shrink-0 mt-0.5" size={14} />
-                                {item}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-x-12">
+                {[
+                    { head: 'When to use agile', items: agileVsPredictive.whenToUse.agile, mark: 'text-lapis' },
+                    { head: 'When to use predictive', items: agileVsPredictive.whenToUse.predictive, mark: 'text-saffron' },
+                    { head: 'When to use hybrid', items: agileVsPredictive.whenToUse.hybrid, mark: 'text-ink-muted' },
+                ].map((column) => (
+                    <div key={column.head}>
+                        <p className={`label border-b-2 border-rule-strong pb-2 mb-1 ${column.mark}`}>
+                            {column.head}
+                        </p>
+                        <ul>
+                            {column.items.map((item, idx) => (
+                                <li key={idx} className="flex items-baseline gap-3 py-3 border-b border-rule
+                                                         font-text text-[13.5px] text-ink-soft leading-relaxed">
+                                    <span className={`shrink-0 ${column.mark}`}>—</span>
+                                    {item}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ))}
+            </section>
         </div>
     );
+
+    /* ---------------------------------------------------------- Leadership */
 
     const renderLeadership = () => (
-        <div className="space-y-6">
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-6 border border-amber-200">
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{servantLeadership.title}</h3>
-                <p className="text-slate-600">{servantLeadership.description}</p>
-            </div>
+        <div className="space-y-16">
+            <section className="border-l-2 border-saffron pl-6 sm:pl-8">
+                <h3 className="font-display text-2xl sm:text-3xl font-semibold text-ink">
+                    {servantLeadership.title}
+                </h3>
+                <p className="page-standfirst mt-3">{servantLeadership.description}</p>
+            </section>
 
-            <div className="bg-white rounded-xl p-6 border border-slate-200">
-                <h4 className="font-bold text-slate-900 mb-4">10 Principles of Servant Leadership</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <section>
+                <Subhead count={servantLeadership.principles.length}>
+                    The ten principles
+                </Subhead>
+                <ol className="grid grid-cols-1 md:grid-cols-2 gap-x-14">
                     {servantLeadership.principles.map((principle, idx) => (
-                        <div key={idx} className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                            <div className="flex items-center gap-3 mb-2">
-                                <span className="w-8 h-8 rounded-full bg-amber-200 text-amber-700 flex items-center justify-center font-bold text-sm">
-                                    {idx + 1}
-                                </span>
-                                <h5 className="font-semibold text-amber-800">{principle.name}</h5>
-                            </div>
-                            <p className="text-sm text-amber-700">{principle.description}</p>
-                        </div>
+                        <li key={idx}>
+                            <Term index={idx + 1} name={principle.name}>
+                                {principle.description}
+                            </Term>
+                        </li>
                     ))}
-                </div>
-            </div>
+                </ol>
+            </section>
 
-            <div className="bg-white rounded-xl p-6 border border-slate-200">
-                <h4 className="font-bold text-slate-900 mb-4">Application in Agile</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <section>
+                <Subhead accent>Application in agile</Subhead>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-14">
                     {servantLeadership.applicationInAgile.map((item, idx) => (
-                        <div key={idx} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
-                            <Award className="text-purple-600 flex-shrink-0 mt-0.5" size={18} />
-                            <span className="text-slate-700">{item}</span>
-                        </div>
+                        <li key={idx} className="flex items-baseline gap-3 py-3.5 border-b border-rule
+                                                 font-text text-[14px] text-ink-soft leading-relaxed">
+                            <span className="text-lapis shrink-0">—</span>
+                            {item}
+                        </li>
                     ))}
-                </div>
-            </div>
+                </ul>
+            </section>
         </div>
     );
+
+    /* -------------------------------------------------------------------- */
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
         >
-            {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                    Agile <span className="text-purple-600">Methodologies</span>
-                </h1>
-                <p className="text-slate-600">
-                    Comprehensive guide to agile frameworks, practices, and principles for the PMP exam
-                </p>
-                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm text-blue-700">
-                        <strong>Exam Tip:</strong> About 50% of PMP exam questions involve agile or hybrid approaches. 
-                        Understand when to use each framework and the underlying principles.
-                    </p>
-                </div>
-            </div>
+            <PageHeader
+                number="§ V"
+                kicker="Adaptive"
+                title="Agile Methodologies"
+                standfirst="Frameworks, practices and roles — and the judgement about which of them a given situation is asking for."
+                note="Roughly half the current exam sits in agile or hybrid territory. The frameworks matter less than knowing when each one is the right answer."
+            />
 
-            {/* Tabs */}
-            <div className="flex flex-wrap gap-2 mb-6 border-b border-slate-200 pb-4">
-                {tabs.map(tab => {
-                    const IconComponent = tab.icon;
-                    return (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                                activeTab === tab.id
-                                    ? 'bg-purple-600 text-white'
-                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                            }`}
-                        >
-                            <IconComponent size={18} />
-                            {tab.name}
-                        </button>
-                    );
-                })}
-            </div>
+            <nav className="flex gap-8 overflow-x-auto custom-scrollbar border-b border-rule-strong mb-12">
+                {tabs.map((tab) => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`toc-tab ${activeTab === tab.id ? 'toc-tab-active' : ''}`}
+                    >
+                        {tab.name}
+                    </button>
+                ))}
+            </nav>
 
-            {/* Content */}
-            <div>
-                {activeTab === 'frameworks' && renderFrameworks()}
-                {activeTab === 'practices' && renderPractices()}
-                {activeTab === 'roles' && renderRoles()}
-                {activeTab === 'comparison' && renderComparison()}
-                {activeTab === 'leadership' && renderLeadership()}
-            </div>
+            {activeTab === 'frameworks' && renderFrameworks()}
+            {activeTab === 'practices' && renderPractices()}
+            {activeTab === 'roles' && renderRoles()}
+            {activeTab === 'comparison' && renderComparison()}
+            {activeTab === 'leadership' && renderLeadership()}
         </motion.div>
     );
 };

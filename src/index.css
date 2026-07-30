@@ -1,50 +1,231 @@
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&family=Archivo:ital,wght@0,300..700;1,300..600&display=swap');
 @import "tailwindcss";
 
-:root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --primary: #8b5cf6;
-  --primary-hover: #7c3aed;
+/* ==========================================================================
+   PMP — A study manual.
+   Identity: lapis and saffron on cool ivory — the colours of an illuminated
+   manuscript. A didone display face over a neo-grotesque text face.
+   No gradients, no glass, no glow. Hierarchy is made with type and rules.
+   ========================================================================== */
+
+@theme {
+  /* Ivory */
+  --color-paper: #f4f2ec;
+  --color-paper-raised: #fcfbf7;
+  --color-sunk: #e9e6dc;
+
+  /* Ink — a deep lapis-black, the colour of a loaded nib */
+  --color-ink: #131f37;
+  --color-ink-soft: #35415c;
+  --color-ink-muted: #626c84;
+  --color-ink-faint: #9aa1b0;
+
+  /* Rules */
+  --color-rule: #d9d5c9;
+  --color-rule-strong: #b6b1a1;
+
+  /* Lapis — the structural accent. Rules, links, active states, labels. */
+  --color-lapis: #1e3a78;
+  --color-lapis-deep: #14295a;
+  --color-lapis-tint: #e3e8f2;
+
+  /* Saffron — rubrication and illumination. Numerals, marginal marks. */
+  --color-saffron: #a5741a;
+  --color-saffron-bright: #c08b23;
+  --color-saffron-tint: #f4ecd9;
+
+  /* Verdict — only where right and wrong must be unmistakable (the quiz).
+     Muted into the palette rather than borrowed from a traffic light. */
+  --color-correct: #2f6b4f;
+  --color-correct-tint: #e6efe9;
+  --color-wrong: #9c3b2c;
+  --color-wrong-tint: #f5e6e2;
+
+  --font-display: "Bodoni Moda", "Didot", Georgia, serif;
+  --font-text: "Archivo", system-ui, -apple-system, sans-serif;
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-text);
+  font-size: 16px;
+  line-height: 1.6;
   overflow-x: hidden;
+  /* A faint tooth, so the page reads as stock rather than as a screen. */
+  background-image:
+    radial-gradient(circle at 15% 12%, rgba(60, 70, 100, 0.045) 0 1px, transparent 1px),
+    radial-gradient(circle at 68% 47%, rgba(60, 70, 100, 0.035) 0 1px, transparent 1px),
+    radial-gradient(circle at 37% 83%, rgba(60, 70, 100, 0.045) 0 1px, transparent 1px);
+  background-size: 140px 140px, 190px 190px, 110px 110px;
 }
 
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.14;
+  text-wrap: balance;
+}
+
+::selection {
+  background: var(--color-lapis);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-lapis);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Components
+   -------------------------------------------------------------------------- */
+
 @layer components {
+
+  /* --- Typographic furniture ------------------------------------------- */
+
+  /* Letterspaced grotesque label. Does the work coloured pill badges used to. */
+  .label {
+    @apply font-text text-[10.5px] font-semibold uppercase tracking-[0.18em] text-ink-muted;
+  }
+
+  .label-accent {
+    @apply font-text text-[10.5px] font-semibold uppercase tracking-[0.18em] text-lapis;
+  }
+
+  /* Rubricated numeral — the illuminator's gold section mark. */
+  .numeral {
+    @apply font-display text-saffron;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .figure {
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+  }
+
+  .page-title {
+    @apply font-display text-[2.25rem] sm:text-5xl md:text-[3.25rem] font-semibold
+           text-ink leading-[1.06] tracking-[-0.005em];
+  }
+
+  /* Bodoni is a high-contrast face — it needs a little more weight at text
+     sizes than a text serif would, or the hairlines disappear. */
+  .page-standfirst {
+    @apply font-display text-lg sm:text-xl font-medium text-ink-soft leading-relaxed max-w-2xl italic;
+  }
+
+  /* --- Surfaces --------------------------------------------------------- */
+
+  /* A plate: hairline-ruled, square, no shadow. The card, de-carded. */
+  .plate {
+    @apply bg-paper-raised border border-rule rounded-[2px];
+  }
+
+  .plate-quiet {
+    @apply bg-sunk border border-rule rounded-[2px];
+  }
+
+  .plate-link {
+    @apply bg-paper-raised border border-rule rounded-[2px] transition-colors duration-200
+           hover:border-lapis hover:bg-[#fffefb];
+  }
+
+  /* A ruled row — the workhorse in place of cards. */
+  .row-link {
+    @apply transition-colors duration-150 hover:bg-[rgba(252,251,247,0.85)];
+  }
+
+  /* --- Controls ---------------------------------------------------------- */
+
   .btn-primary {
-    @apply px-4 sm:px-6 py-2.5 sm:py-3 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base;
+    @apply inline-flex items-center justify-center gap-2.5 rounded-[2px] bg-lapis px-6 py-3
+           font-text text-[11px] font-semibold uppercase tracking-[0.16em] text-paper-raised
+           transition-colors duration-200 hover:bg-lapis-deep;
   }
 
   .btn-secondary {
-    @apply px-4 sm:px-6 py-2.5 sm:py-3 bg-white text-slate-700 font-semibold rounded-lg border border-slate-200 shadow-sm hover:bg-slate-50 transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base;
+    @apply inline-flex items-center justify-center gap-2.5 rounded-[2px] border border-rule-strong
+           bg-transparent px-6 py-3 font-text text-[11px] font-semibold uppercase tracking-[0.16em]
+           text-ink-soft transition-colors duration-200 hover:border-ink hover:text-ink;
   }
 
-  .card-hover {
-    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+  .btn-quiet {
+    @apply inline-flex items-center justify-center gap-2 rounded-[2px] border border-rule
+           px-4 py-2 font-text text-[11px] font-semibold uppercase tracking-[0.14em]
+           text-ink-muted transition-colors duration-200 hover:border-ink-muted hover:text-ink;
   }
+
+  /* Tabs read as a table of contents, not as a segmented iOS control. */
+  .toc-tab {
+    @apply relative -mb-px border-b-2 border-transparent px-1 pb-3 font-text text-[11px]
+           font-semibold uppercase tracking-[0.16em] text-ink-faint transition-colors duration-200
+           hover:text-ink-soft whitespace-nowrap;
+  }
+
+  .toc-tab-active {
+    @apply border-saffron text-ink;
+  }
+
+  .field {
+    @apply w-full rounded-[2px] border border-rule bg-paper-raised px-3 py-2.5 font-display text-base
+           italic text-ink placeholder:text-ink-faint
+           focus:border-lapis focus:outline-none;
+  }
+
+  /* --- Measure ----------------------------------------------------------- */
+
+  .measure { max-width: 68ch; }
+  .measure-tight { max-width: 54ch; }
 }
 
-/* Custom Scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* --------------------------------------------------------------------------
+   Ornament — a faint girih watermark, anchored and fading diagonally.
+   -------------------------------------------------------------------------- */
+
+.ornament {
+  position: fixed;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  color: var(--color-lapis);
+  opacity: 0.09;
+  animation: ornament-breathe 34s ease-in-out infinite;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+@keyframes ornament-breathe {
+  0%, 100% { opacity: 0.07; }
+  50%      { opacity: 0.125; }
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+/* The illuminated band beneath the masthead. */
+.ornament-band {
+  height: 9px;
+  background-repeat: repeat-x;
+  background-size: auto 9px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+@media (prefers-reduced-motion: reduce) {
+  .ornament { animation: none; opacity: 0.07; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* --------------------------------------------------------------------------
+   Scrollbar
+   -------------------------------------------------------------------------- */
+
+.custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: var(--color-rule-strong); border-radius: 0; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--color-ink-faint); }

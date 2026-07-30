@@ -1,114 +1,119 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { BookOpen, UserCircle, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import IlluminatedBand from "./IlluminatedBand";
+
+/* The wordmark's mark: an 8-point khatam, two squares overlaid. */
+const Khatam = ({ size = 24 }) => (
+  <svg width={size} height={size} viewBox="-24 -24 48 48" aria-hidden="true">
+    <g fill="none" stroke="currentColor" strokeWidth="1.5">
+      <rect x="-14.5" y="-14.5" width="29" height="29" />
+      <rect x="-14.5" y="-14.5" width="29" height="29" transform="rotate(45)" />
+      <circle r="5.5" />
+    </g>
+  </svg>
+);
+
+const navLinks = [
+  { path: "/", name: "Dashboard", end: true },
+  { path: "/domains", name: "Domains" },
+  { path: "/principles", name: "Principles" },
+  { path: "/process-grid", name: "Process Grid" },
+  { path: "/models-methods", name: "Tools" },
+  { path: "/agile", name: "Agile" },
+  { path: "/exam-prep", name: "Exam Prep" },
+];
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navLinks = [
-    { path: "/", name: "Dashboard" },
-    { path: "/domains", name: "Domains" },
-    { path: "/principles", name: "Principles" },
-    { path: "/process-grid", name: "Process Grid" },
-    { path: "/models-methods", name: "Tools" },
-    { path: "/agile", name: "Agile" },
-    { path: "/exam-prep", name: "Exam Prep" },
-  ];
-
   return (
-    <nav className="bg-white border-b border-slate-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 mr-2"
-            >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-
-            <div className="flex-shrink-0 flex items-center gap-2">
-              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center text-white">
-                <BookOpen size={20} />
-              </div>
-              <span className="font-bold text-lg sm:text-xl text-slate-900">
-                PMP Study Guide
+    <header className="sticky top-0 z-50">
+      {/* Masthead — solid lapis, the colour block that carries the identity */}
+      <div className="bg-lapis text-paper-raised">
+        <div className="max-w-[84rem] mx-auto px-4 sm:px-6 lg:px-10">
+          <div className="flex items-center justify-between h-16 lg:h-[4.75rem]">
+            <div className="flex items-center gap-3.5">
+              <span className="text-saffron-bright">
+                <Khatam />
               </span>
+              <div className="flex items-baseline gap-3">
+                <span className="font-display text-[1.6rem] font-semibold tracking-tight leading-none">
+                  PMP
+                </span>
+                <span className="hidden sm:inline font-text text-[10.5px] font-semibold
+                                 uppercase tracking-[0.18em] text-paper-raised/60">
+                  A Study Manual
+                </span>
+              </div>
             </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden lg:ml-10 lg:flex lg:space-x-6">
-              {navLinks.map((link) => (
-                <NavLink
-                  key={link.path}
-                  to={link.path}
-                  className={({ isActive }) =>
-                    `inline-flex items-center px-1 pt-1 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                      isActive
-                        ? "border-purple-600 text-slate-900"
-                        : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
-                    }`
-                  }
-                >
-                  {link.name}
-                </NavLink>
-              ))}
+            <div className="flex items-center gap-5">
+              <span className="hidden sm:inline font-text text-[10.5px] font-semibold
+                               uppercase tracking-[0.18em] text-paper-raised/60">
+                Seventh&nbsp;Edition
+              </span>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Menu"
+                className="lg:hidden -mr-2 p-2 text-paper-raised/70 hover:text-paper-raised transition-colors"
+              >
+                {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
             </div>
           </div>
+        </div>
 
-          <div className="flex items-center gap-2 lg:gap-4">
-            {/* <a
-              href="https://tegnum.edu.pe/wp-content/uploads/2023/09/Project-Management-Institute-A-Guide-to-the-Project-Management-Body-of-Knowledge-PMBOK-R-Guide-PMBOK%C2%AE%EF%B8%8F-Guide-Project-Management-Institute-2021.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden lg:block text-sm font-medium text-slate-500 hover:text-purple-600 transition-colors whitespace-nowrap"
-            >
-              PMBOK PDF
-            </a> */}
-            <div className="flex items-center gap-1.5 px-2 py-1.5 bg-green-50 text-green-700 rounded-full text-xs font-medium border border-green-100">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="hidden sm:inline">Study </span>Mode
-            </div>
-            <button className="hidden sm:block text-slate-400 hover:text-slate-600">
-              <UserCircle size={24} />
-            </button>
-          </div>
+        {/* Illumination */}
+        <div className="text-saffron-bright/75">
+          <IlluminatedBand />
         </div>
       </div>
 
-      {/* Mobile Navigation */}
+      {/* Contents bar */}
+      <div className="hidden lg:block bg-paper border-b border-rule-strong">
+        <nav className="max-w-[84rem] mx-auto px-10 flex gap-9">
+          {navLinks.map((link) => (
+            <NavLink
+              key={link.path}
+              to={link.path}
+              end={link.end}
+              className={({ isActive }) =>
+                `toc-tab pt-3.5 ${isActive ? "toc-tab-active" : ""}`
+              }
+            >
+              {link.name}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
+
+      {/* Mobile contents */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-200 bg-white">
-          <div className="px-4 py-3 space-y-1">
-            {navLinks.map((link) => (
+        <nav className="lg:hidden bg-paper-raised border-b border-rule-strong">
+          <div className="px-4 sm:px-6 py-2 divide-y divide-rule">
+            {navLinks.map((link, i) => (
               <NavLink
                 key={link.path}
                 to={link.path}
+                end={link.end}
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
-                  `block px-3 py-2.5 rounded-lg text-base font-medium transition-colors ${
-                    isActive
-                      ? "bg-purple-50 text-purple-700"
-                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  `flex items-baseline gap-4 py-3 font-display text-lg transition-colors ${
+                    isActive ? "text-lapis" : "text-ink-soft hover:text-ink"
                   }`
                 }
               >
+                <span className="numeral text-sm w-5 shrink-0">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
                 {link.name}
               </NavLink>
             ))}
-            <a
-              href="https://tegnum.edu.pe/wp-content/uploads/2023/09/Project-Management-Institute-A-Guide-to-the-Project-Management-Body-of-Knowledge-PMBOK-R-Guide-PMBOK%C2%AE%EF%B8%8F-Guide-Project-Management-Institute-2021.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block px-3 py-2.5 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-purple-600"
-            >
-              PMBOK PDF
-            </a>
           </div>
-        </div>
+        </nav>
       )}
-    </nav>
+    </header>
   );
 };
 
