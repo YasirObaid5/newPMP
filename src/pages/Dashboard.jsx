@@ -1,8 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import Cloth from '../components/canvasui/Cloth';
 import Droplets from '../components/canvasui/Droplets';
-import ProjectAtmosphere from '../components/ProjectAtmosphere';
 
 const domains = [
   {
@@ -47,7 +45,35 @@ const domains = [
 const Dashboard = () => (
   <div>
     <section className="pmp-hero">
-      <ProjectAtmosphere />
+      <Droplets
+        className="pmp-hero-art"
+        intensity={0.68}
+        speed={0.5}
+        scale={0.72}
+        dropWidth={0.82}
+        dropLength={1.05}
+        refraction={0.24}
+        blur={0.15}
+        fallSpeed={0.58}
+        wiggle={0.48}
+        staticDrops={0.52}
+        interactive
+        interactionRadius={0.2}
+        interactionStrength={0.78}
+        interactionDistortion={2.4}
+        tint={[0.76, 0.86, 0.94]}
+        tintStrength={0.18}
+      >
+        <img
+          src="/art/pmp-journey.jpg"
+          alt="Three project paths converging at a luminous pavilion"
+          className="pmp-journey-art"
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+        />
+      </Droplets>
+
       <div className="pmp-hero-grid">
         <div className="pmp-hero-copy">
           <div className="pmp-eyebrow">
@@ -78,61 +104,18 @@ const Dashboard = () => (
           </div>
         </div>
 
-        <div className="pmp-cloth-stage">
-          <div className="pmp-art-caption">
-            <span>The river remembers every decision.</span>
-            <span>Move through the rain</span>
-          </div>
-          <Droplets
-            className="pmp-droplets"
-            intensity={0.68}
-            speed={0.5}
-            scale={0.72}
-            dropWidth={0.82}
-            dropLength={1.05}
-            refraction={0.24}
-            blur={0.15}
-            fallSpeed={0.58}
-            wiggle={0.48}
-            staticDrops={0.52}
-            interactive
-            interactionRadius={0.2}
-            interactionStrength={0.78}
-            interactionDistortion={2.4}
-            tint={[0.76, 0.86, 0.94]}
-            tintStrength={0.18}
-          >
-            <Cloth
-              className="pmp-cloth"
-              pin="left"
-              wind={1.35}
-              speed={0.38}
-              amplitude={18}
-              drape={28}
-              brush={1.25}
-              brushSize={180}
-              damping={1.3}
-              light={0.62}
-              sheen={0.08}
-              shadow={0.42}
-              cornerRadius={3}
-              perspective={1450}
-            >
-              <img
-                src="/art/pmp-journey.jpg"
-                alt="Three project paths converging at a luminous pavilion"
-                className="pmp-journey-art"
-              />
-            </Cloth>
-            <blockquote className="pmp-wisdom-card">
-              <span>A project meditation</span>
-              <p>Purpose is the riverbed.</p>
-              <small>Plans may bend; value must still arrive.</small>
-            </blockquote>
-          </Droplets>
-        </div>
       </div>
-      <div className="pmp-scroll-mark" aria-hidden="true"><span /> Explore the manual</div>
+
+      <div className="pmp-art-caption">
+        <span>The river remembers every decision.</span>
+        <span>Move through the rain</span>
+      </div>
+
+      <blockquote className="pmp-wisdom-card">
+        <span>A project meditation</span>
+        <p>Purpose is the riverbed.</p>
+        <small>Plans may bend; value must still arrive.</small>
+      </blockquote>
     </section>
 
     <section className="pmp-intro">
