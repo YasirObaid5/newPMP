@@ -50,9 +50,9 @@ const Navbar = () => {
               </div>
             </div>
 
-            <div className="pmp-calligraphy" lang={isArabic ? "ar" : "zh-Hant"} aria-label="The Way of the Project" data-no-translate>
-              <span>{isArabic ? "طريق المشروع" : "項目之道"}</span>
-              <i aria-hidden="true">{isArabic ? "نهج" : "道"}</i>
+            <div className="pmp-calligraphy" lang="zh-Hant" aria-label="The Way of the Project" data-no-translate>
+              <span>項目之道</span>
+              <i aria-hidden="true">道</i>
             </div>
 
             <div className="flex items-center gap-5">
