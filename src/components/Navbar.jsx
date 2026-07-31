@@ -32,7 +32,7 @@ const Navbar = () => {
       {/* Masthead — solid lapis, the colour block that carries the identity */}
       <div className="pmp-masthead text-paper-raised">
         <div className="max-w-[84rem] mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="flex items-center justify-between h-16 lg:h-[4.75rem]">
+          <div className="relative flex items-center justify-between h-16 lg:h-[4.75rem]">
             <div className="flex items-center gap-3.5">
               <span className="text-saffron-bright">
                 <Khatam />
@@ -46,6 +46,11 @@ const Navbar = () => {
                   The Way of the Project
                 </span>
               </div>
+            </div>
+
+            <div className="pmp-calligraphy" lang="zh-Hant" aria-label="The Way of the Project">
+              <span>項目之道</span>
+              <i aria-hidden="true">道</i>
             </div>
 
             <div className="flex items-center gap-5">
