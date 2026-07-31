@@ -126,6 +126,91 @@ h1, h2, h3, h4 {
     @apply font-display text-lg sm:text-xl font-medium text-ink-soft leading-relaxed max-w-2xl italic;
   }
 
+  /* A chapter opens as a painted scroll: image, argument and marginal wisdom. */
+  .chapter-hero {
+    @apply relative isolate overflow-hidden border-y-2 border-ink bg-paper-raised;
+    min-height: clamp(28rem, 42vw, 34rem);
+  }
+
+  .chapter-hero-image {
+    @apply absolute inset-0 z-0 h-full w-full object-cover;
+  }
+
+  .chapter-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg,
+        rgba(244, 242, 236, 0.98) 0%,
+        rgba(244, 242, 236, 0.90) 32%,
+        rgba(244, 242, 236, 0.52) 55%,
+        rgba(244, 242, 236, 0.08) 82%),
+      linear-gradient(0deg,
+        rgba(244, 242, 236, 0.80) 0%,
+        rgba(244, 242, 236, 0) 38%);
+  }
+
+  .chapter-hero-content {
+    @apply relative z-10 flex min-h-[inherit] flex-col p-6 sm:p-9 lg:p-12;
+  }
+
+  .chapter-hero-meta {
+    @apply mb-7 flex items-baseline gap-4 border-t-2 border-ink pt-3;
+    width: min(34rem, 72%);
+  }
+
+  .chapter-hero-title {
+    @apply font-display font-semibold text-ink leading-[0.98] tracking-[-0.015em];
+    font-size: clamp(2.55rem, 5.4vw, 4.8rem);
+    max-width: 10ch;
+  }
+
+  .chapter-hero-standfirst {
+    @apply mt-5 font-display font-medium italic text-ink-soft leading-relaxed;
+    font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+    max-width: 39rem;
+  }
+
+  .chapter-hero-note {
+    @apply mt-auto border-l border-lapis pl-4 pt-5 font-text text-[13px] leading-relaxed text-ink-muted;
+    max-width: 38rem;
+  }
+
+  .chapter-hero-maxim {
+    @apply absolute bottom-8 right-8 border-t border-saffron px-4 py-3 font-display text-lg
+           font-medium italic leading-snug text-ink sm:bottom-10 sm:right-10 lg:bottom-12 lg:right-12;
+    max-width: 18rem;
+    background: rgba(244, 242, 236, 0.82);
+  }
+
+  @media (max-width: 767px) {
+    .chapter-hero::after {
+      background: rgba(244, 242, 236, 0.72);
+    }
+
+    .chapter-hero-meta {
+      width: 100%;
+    }
+
+    .chapter-hero-title {
+      max-width: 12ch;
+    }
+
+    .chapter-hero-note {
+      margin-bottom: 5.75rem;
+    }
+
+    .chapter-hero-maxim {
+      left: 1.5rem;
+      right: 1.5rem;
+      bottom: 1.5rem;
+      max-width: none;
+    }
+  }
+
   /* --- Surfaces --------------------------------------------------------- */
 
   /* A plate: hairline-ruled, square, no shadow. The card, de-carded. */

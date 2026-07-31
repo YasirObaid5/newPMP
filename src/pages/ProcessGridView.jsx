@@ -98,6 +98,10 @@ const ProcessGridView = () => {
         title="The Process Grid"
         standfirst="Forty-nine processes, set against ten knowledge areas and five process groups."
         note="Carried over from the sixth edition. The current exam no longer tests the grid directly, but it remains the clearest map of predictive delivery. Any process opens to its inputs, tools and outputs."
+        image="/art/chapter-process-grid.jpg"
+        imageAlt="Ordered mountain paths and bridges leading to a distant pavilion"
+        maxim="A clear path need not become a rigid path."
+        imagePosition="center bottom"
       />
 
       <div className="overflow-x-auto pb-6 -mx-4 px-4 sm:mx-0 sm:px-0 custom-scrollbar">

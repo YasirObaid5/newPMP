@@ -41,6 +41,10 @@ const ModelsMethodsView = () => {
         title="Models, Methods & Artifacts"
         standfirst="The working vocabulary — what to think with, what to do, and what it leaves behind."
         note="Tailoring is the point. The exam rewards choosing the lightest instrument that answers the question, not the most thorough one."
+        image="/art/chapter-tools.jpg"
+        imageAlt="A scholar's tools arranged beside a quiet mountain lake"
+        maxim="Choose the instrument the moment requires."
+        imagePosition="center bottom"
       />
 
       {/* Controls */}

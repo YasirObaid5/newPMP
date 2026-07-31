@@ -20,6 +20,10 @@ const PrinciplesView = () => {
         title="The Twelve Principles"
         standfirst="Not prescriptive rules, but the mindsets a project professional is expected to reason from."
         note="The seventh edition replaced process compliance with principled judgement. Every situational question on the exam is, underneath, asking which of these twelve applies."
+        image="/art/chapter-principles.jpg"
+        imageAlt="An ancient pine with deep roots overlooking a misty river"
+        maxim="Root the judgement before you move the work."
+        imagePosition="center bottom"
       />
 
       {/* A numbered reference list, two columns wide. */}

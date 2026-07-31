@@ -19,6 +19,10 @@ const DomainsView = () => {
         title="Performance Domains"
         standfirst="Groups of related activities that are critical to the effective delivery of project outcomes."
         note="The eight domains operate simultaneously rather than in sequence. Weakness in one shows up as a symptom in another."
+        image="/art/chapter-domains.jpg"
+        imageAlt="Many mountain streams converging into one river"
+        maxim="Many currents. One destination."
+        imagePosition="center bottom"
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-12 gap-y-8">

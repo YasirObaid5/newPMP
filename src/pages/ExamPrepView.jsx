@@ -619,6 +619,10 @@ const ExamPrepView = () => {
                 title="Exam Preparation"
                 standfirst="What the paper asks, how it asks it, and the habits of mind that answer it."
                 note="One hundred and eighty questions in two hundred and thirty minutes. The practice set below is scored as you go."
+                image="/art/chapter-exam-prep.jpg"
+                imageAlt="A measured mountain path rising toward a gate at dawn"
+                maxim="Calm judgement outlasts memorised answers."
+                imagePosition="center bottom"
             />
 
             <nav className="flex gap-8 overflow-x-auto custom-scrollbar border-b border-rule-strong mb-12">

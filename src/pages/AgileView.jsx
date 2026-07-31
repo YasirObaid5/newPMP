@@ -664,6 +664,10 @@ const AgileView = () => {
                 title="Agile Methodologies"
                 standfirst="Frameworks, practices and roles — and the judgement about which of them a given situation is asking for."
                 note="Roughly half the current exam sits in agile or hybrid territory. The frameworks matter less than knowing when each one is the right answer."
+                image="/art/chapter-agile.jpg"
+                imageAlt="A flexible bamboo grove and changing paths through rain"
+                maxim="Bend with change. Keep value in sight."
+                imagePosition="center bottom"
             />
 
             <nav className="flex gap-8 overflow-x-auto custom-scrollbar border-b border-rule-strong mb-12">
