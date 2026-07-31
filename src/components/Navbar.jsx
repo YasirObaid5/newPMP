@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import IlluminatedBand from "./IlluminatedBand";
+import { useLanguage } from "../i18n/LanguageContext";
 
 /* The wordmark's mark: an 8-point khatam, two squares overlaid. */
 const Khatam = ({ size = 24 }) => (
@@ -26,6 +27,7 @@ const navLinks = [
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isArabic, toggleLanguage } = useLanguage();
 
   return (
     <header className="sticky top-0 z-50">
@@ -38,7 +40,7 @@ const Navbar = () => {
                 <Khatam />
               </span>
               <div className="flex items-baseline gap-3">
-                <span className="font-display text-[1.6rem] font-semibold tracking-tight leading-none">
+                <span className="font-display text-[1.6rem] font-semibold tracking-tight leading-none" data-no-translate>
                   PMP
                 </span>
                 <span className="hidden sm:inline font-text text-[10.5px] font-semibold
@@ -48,12 +50,21 @@ const Navbar = () => {
               </div>
             </div>
 
-            <div className="pmp-calligraphy" lang="zh-Hant" aria-label="The Way of the Project">
-              <span>項目之道</span>
-              <i aria-hidden="true">道</i>
+            <div className="pmp-calligraphy" lang={isArabic ? "ar" : "zh-Hant"} aria-label="The Way of the Project" data-no-translate>
+              <span>{isArabic ? "طريق المشروع" : "項目之道"}</span>
+              <i aria-hidden="true">{isArabic ? "نهج" : "道"}</i>
             </div>
 
             <div className="flex items-center gap-5">
+              <button
+                type="button"
+                onClick={toggleLanguage}
+                className="pmp-language-switch"
+                aria-label={isArabic ? "Switch to English" : "التبديل إلى العربية"}
+                data-no-translate
+              >
+                {isArabic ? "English" : "العربية"}
+              </button>
               <span className="hidden sm:inline font-text text-[10.5px] font-semibold
                                uppercase tracking-[0.18em] text-paper-raised/60">
                 Seventh&nbsp;Edition

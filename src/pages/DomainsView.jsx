@@ -1,6 +1,7 @@
 ﻿
 import React, { useState } from 'react';
 import { performanceDomains } from '../pmpData';
+// eslint-disable-next-line no-unused-vars -- motion is used through JSX member tags.
 import { motion, AnimatePresence } from 'framer-motion';
 import PageHeader from '../components/PageHeader';
 

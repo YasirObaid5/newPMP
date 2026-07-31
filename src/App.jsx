@@ -9,10 +9,11 @@ import ModelsMethodsView from './pages/ModelsMethodsView';
 import ProcessGridView from './pages/ProcessGridView';
 import AgileView from './pages/AgileView';
 import ExamPrepView from './pages/ExamPrepView';
+import { LanguageProvider } from './i18n/LanguageContext';
 
-function App() {
+function RoutedApp() {
   return (
-    <Router>
+    <LanguageProvider>
       <Routes>
         <Route path="/" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
@@ -25,6 +26,14 @@ function App() {
           <Route path="artifacts" element={<Navigate to="/models-methods" replace />} />
         </Route>
       </Routes>
+    </LanguageProvider>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <RoutedApp />
     </Router>
   );
 }

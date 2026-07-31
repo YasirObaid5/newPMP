@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&family=Archivo:ital,wght@0,300..700;1,300..600&family=Ma+Shan+Zheng&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..700&family=Archivo:ital,wght@0,300..700;1,300..600&family=Ma+Shan+Zheng&family=Noto+Kufi+Arabic:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 /* ==========================================================================
@@ -706,4 +706,219 @@ h1, h2, h3, h4 {
 
 @media (prefers-reduced-motion: reduce) {
   .pmp-hero-art canvas { display: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Arabic edition — independently balanced RTL composition.
+   -------------------------------------------------------------------------- */
+
+.pmp-language-switch {
+  min-width: 4.2rem;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid rgba(244, 242, 236, 0.34);
+  color: rgba(252, 251, 247, 0.82);
+  font-family: var(--font-text);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: border-color 180ms ease, color 180ms ease;
+}
+
+.pmp-language-switch:hover {
+  border-color: var(--color-saffron-bright);
+  color: var(--color-paper-raised);
+}
+
+html[dir="rtl"] {
+  --font-display: "Noto Kufi Arabic", sans-serif;
+  --font-text: "Noto Naskh Arabic", serif;
+}
+
+html[dir="rtl"] body {
+  text-align: right;
+  font-family: var(--font-text);
+  line-height: 1.9;
+}
+
+html[dir="rtl"] h1,
+html[dir="rtl"] h2,
+html[dir="rtl"] h3,
+html[dir="rtl"] h4 {
+  line-height: 1.35;
+  letter-spacing: -0.035em;
+}
+
+html[dir="rtl"] .label,
+html[dir="rtl"] .label-accent,
+html[dir="rtl"] .toc-tab,
+html[dir="rtl"] .btn-primary,
+html[dir="rtl"] .btn-secondary,
+html[dir="rtl"] .btn-quiet,
+html[dir="rtl"] .pmp-eyebrow,
+html[dir="rtl"] .pmp-button-light,
+html[dir="rtl"] .pmp-button-ghost {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+html[dir="rtl"] .pmp-calligraphy {
+  font-family: "Noto Kufi Arabic", sans-serif;
+}
+
+html[dir="rtl"] .pmp-calligraphy > span {
+  font-size: 1.25rem;
+  letter-spacing: 0;
+}
+
+html[dir="rtl"] .pmp-calligraphy > i {
+  width: 2rem;
+  font-size: 0.58rem;
+}
+
+html[dir="rtl"] .chapter-hero-image,
+html[dir="rtl"] .pmp-journey-art {
+  transform: scaleX(-1);
+}
+
+html[dir="rtl"] .chapter-hero::after {
+  background:
+    linear-gradient(270deg,
+      rgba(244, 242, 236, 0.98) 0%,
+      rgba(244, 242, 236, 0.90) 32%,
+      rgba(244, 242, 236, 0.52) 55%,
+      rgba(244, 242, 236, 0.08) 82%),
+    linear-gradient(0deg,
+      rgba(244, 242, 236, 0.80) 0%,
+      rgba(244, 242, 236, 0) 38%);
+}
+
+html[dir="rtl"] .chapter-hero-title {
+  max-width: 12ch;
+}
+
+html[dir="rtl"] .chapter-hero-note {
+  padding-right: 1rem;
+  padding-left: 0;
+  border-right: 1px solid var(--color-lapis);
+  border-left: 0;
+}
+
+html[dir="rtl"] .chapter-hero-maxim {
+  right: auto;
+  left: 3rem;
+}
+
+html[dir="rtl"] .pmp-hero::after {
+  background:
+    linear-gradient(270deg,
+      rgba(244, 242, 236, 0.98) 0%,
+      rgba(244, 242, 236, 0.92) 34%,
+      rgba(244, 242, 236, 0.55) 58%,
+      rgba(244, 242, 236, 0.08) 84%),
+    linear-gradient(0deg,
+      rgba(244, 242, 236, 0.82) 0%,
+      rgba(244, 242, 236, 0) 42%);
+}
+
+html[dir="rtl"] .pmp-hero-copy {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+html[dir="rtl"] .pmp-hero h1 {
+  max-width: 9ch;
+  letter-spacing: -0.055em;
+}
+
+html[dir="rtl"] .pmp-art-caption {
+  right: auto;
+  left: clamp(2rem, 4vw, 4.5rem);
+}
+
+html[dir="rtl"] .pmp-wisdom-card {
+  right: auto;
+  left: clamp(2rem, 4vw, 4.5rem);
+}
+
+html[dir="rtl"] .pmp-weight-line > div {
+  padding-right: 0;
+  padding-left: 0.8rem;
+  border-right: 0;
+  border-left: 1px solid rgba(19, 31, 55, 0.18);
+}
+
+html[dir="rtl"] .pmp-weight-line > div + div {
+  padding-right: 0.8rem;
+}
+
+html[dir="rtl"] .pmp-weight-line > div:last-child {
+  border-left: 0;
+}
+
+html[dir="rtl"] .pmp-section-heading > p {
+  padding-right: 1.5rem;
+  padding-left: 0;
+  border-right: 1px solid var(--color-rule-strong);
+  border-left: 0;
+}
+
+html[dir="rtl"] .pmp-domain-metric {
+  padding-right: 1.5rem;
+  padding-left: 0;
+  border-right: 1px solid var(--color-rule);
+  border-left: 0;
+}
+
+html[dir="rtl"] .pmp-domain-link svg,
+html[dir="rtl"] .pmp-button-light svg,
+html[dir="rtl"] .pmp-button-ghost svg {
+  transform: scaleX(-1);
+}
+
+html[dir="rtl"] [class~="text-left"] { text-align: right; }
+html[dir="rtl"] [class~="text-right"] { text-align: left; }
+html[dir="rtl"] [class~="ml-auto"] { margin-right: auto; margin-left: 0; }
+html[dir="rtl"] [class~="mr-1"] { margin-right: 0; margin-left: 0.25rem; }
+html[dir="rtl"] [class~="ml-1"] { margin-left: 0; margin-right: 0.25rem; }
+html[dir="rtl"] [class~="ml-2"] { margin-left: 0; margin-right: 0.5rem; }
+html[dir="rtl"] [class~="ml-3"] { margin-left: 0; margin-right: 0.75rem; }
+html[dir="rtl"] [class~="pl-4"] { padding-left: 0; padding-right: 1rem; }
+html[dir="rtl"] [class~="pl-6"] { padding-left: 0; padding-right: 1.5rem; }
+html[dir="rtl"] [class~="pl-8"] { padding-left: 0; padding-right: 2rem; }
+html[dir="rtl"] [class~="pl-9"] { padding-left: 0; padding-right: 2.25rem; }
+html[dir="rtl"] [class~="pl-12"] { padding-left: 0; padding-right: 3rem; }
+html[dir="rtl"] [class~="pr-2"] { padding-right: 0; padding-left: 0.5rem; }
+html[dir="rtl"] [class~="pr-6"] { padding-right: 0; padding-left: 1.5rem; }
+html[dir="rtl"] [class~="border-l"] { border-left-width: 0; border-right-width: 1px; }
+html[dir="rtl"] [class~="border-l-2"] { border-left-width: 0; border-right-width: 2px; }
+html[dir="rtl"] [class~="border-r"] { border-right-width: 0; border-left-width: 1px; }
+
+@media (max-width: 1023px) {
+  html[dir="rtl"] .pmp-section-heading > p,
+  html[dir="rtl"] .pmp-domain-metric {
+    padding-right: 0;
+    border-right: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  html[dir="rtl"] .chapter-hero::after {
+    background: rgba(244, 242, 236, 0.72);
+  }
+
+  html[dir="rtl"] .chapter-hero-maxim {
+    right: 1.5rem;
+    left: 1.5rem;
+  }
+}
+
+@media (max-width: 639px) {
+  html[dir="rtl"] .pmp-hero::after {
+    background: rgba(244, 242, 236, 0.74);
+  }
+
+  html[dir="rtl"] .pmp-wisdom-card {
+    right: 1.4rem;
+    left: 1.4rem;
+  }
 }

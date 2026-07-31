@@ -1,5 +1,6 @@
 ﻿import React, { useState } from 'react';
 import { pmbok6Data } from '../pmbok6Data';
+// eslint-disable-next-line no-unused-vars -- motion is used through JSX member tags.
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import PageHeader from '../components/PageHeader';

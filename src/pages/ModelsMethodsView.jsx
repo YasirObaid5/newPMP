@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { models, methods, artifacts } from '../pmpData';
 import { Search, X } from 'lucide-react';
+// eslint-disable-next-line no-unused-vars -- motion is used through JSX member tags.
 import { motion, AnimatePresence } from 'framer-motion';
 import PageHeader from '../components/PageHeader';
 

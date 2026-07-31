@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+// eslint-disable-next-line no-unused-vars -- motion is used through JSX member tags.
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, ArrowRight } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
