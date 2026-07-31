@@ -1,167 +1,200 @@
-﻿import React from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import Cloth from '../components/canvasui/Cloth';
+import Droplets from '../components/canvasui/Droplets';
+import ProjectAtmosphere from '../components/ProjectAtmosphere';
 
 const domains = [
   {
     n: 'I',
     title: 'People',
-    subtitle: 'Leadership, team management, and stakeholder engagement',
-    gloss: 'The soft skills the exam treats as hard requirements — coaching, conflict, negotiation, and the servant-leader posture that runs underneath all of it.',
+    subtitle: 'Lead with clarity',
+    gloss: 'Build teams, navigate conflict, coach performance, and keep stakeholders moving in the same direction.',
     weight: 42,
     progress: 65,
     path: '/principles',
+    image: '/art/domain-people-tree.jpg',
+    wisdom: 'Roots before reach.',
+    lesson: 'Trust carries what authority cannot.',
   },
   {
     n: 'II',
     title: 'Process',
-    subtitle: 'Technical project management and methodologies',
-    gloss: 'Half the paper. Predictive, agile and hybrid delivery: planning, execution, measurement, and the tailoring decisions between them.',
+    subtitle: 'Shape the work',
+    gloss: 'Choose the right delivery approach, manage uncertainty, and turn plans into measurable outcomes.',
     weight: 50,
     progress: 45,
     path: '/domains',
+    image: '/art/domain-process-mountain.jpg',
+    wisdom: 'The terrain chooses the path.',
+    lesson: 'Method bends; accountability does not.',
   },
   {
     n: 'III',
     title: 'Business Environment',
-    subtitle: 'Strategic alignment and organizational context',
-    gloss: 'The smallest domain and the most often underprepared — compliance, benefits realisation, and the value the project is meant to return.',
+    subtitle: 'Deliver the value',
+    gloss: 'Connect the project to strategy, compliance, benefits, and the change it exists to create.',
     weight: 8,
     progress: 30,
     path: '/models-methods',
+    image: '/art/domain-business-fish-card-v3.jpg',
+    captionPosition: 'top',
+    wisdom: 'Movement is not value.',
+    lesson: 'The work matters when its benefit arrives.',
   },
 ];
 
 const Dashboard = () => (
-  <motion.div
-    initial={{ opacity: 0, y: 12 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.45, ease: 'easeOut' }}
-  >
-    {/* ---------------------------------------------------------------- Hero */}
-    <section className="border-t-2 border-ink pt-4">
-      <div className="flex items-baseline gap-4 mb-10">
-        <span className="numeral text-sm font-semibold">§</span>
-        <span className="label">Project Management Professional</span>
-      </div>
+  <div>
+    <section className="pmp-hero">
+      <ProjectAtmosphere />
+      <div className="pmp-hero-grid">
+        <div className="pmp-hero-copy">
+          <div className="pmp-eyebrow">
+            <span>The Way of the Project</span>
+            <span className="pmp-edition">07 / Edition</span>
+          </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-10 gap-y-10 items-start">
-        <div className="lg:col-span-7">
-          <h1 className="font-display text-[2.5rem] sm:text-[3.25rem] xl:text-[3.75rem] font-semibold
-                         leading-[1.06] tracking-[-0.015em] text-ink text-balance">
-            A study manual for the seventh edition
-          </h1>
-
-          <p className="page-standfirst mt-7">
-            Principles, performance domains, the predictive process grid, and the
-            agile practices the current exam actually asks about — set out to be
-            read rather than skimmed.
+          <h1>Read the current. Shape the course.</h1>
+          <p>
+            A project, like water, gains power from direction—not force. Align the
+            people, read the terrain, adapt the plan, and carry value to its destination.
           </p>
 
-          <div className="flex flex-wrap gap-3 mt-9">
-            <Link to="/domains" className="btn-primary">
-              Begin <ArrowRight size={15} strokeWidth={2.2} />
+          <div className="pmp-hero-actions">
+            <Link to="/domains" className="pmp-button-light">
+              Enter the guide <ArrowRight size={15} />
             </Link>
-            <Link to="/exam-prep" className="btn-secondary">
-              Exam Preparation
-            </Link>
+            <Link to="/exam-prep" className="pmp-button-ghost">Prepare for the exam</Link>
+          </div>
+
+          <div className="pmp-weight-line" aria-label="Exam domain weights">
+            {domains.map((domain) => (
+              <div key={domain.n}>
+                <span>{domain.title}</span>
+                <strong>{domain.weight}%</strong>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Weights, as a small table set into the margin */}
-        <div className="lg:col-span-4 lg:col-start-9 lg:border-l lg:border-rule lg:pl-8">
-          <p className="label border-b border-rule pb-2 mb-4">Examination weights</p>
-          <dl className="space-y-0">
-            {domains.map((d) => (
-              <div key={d.n} className="flex items-baseline justify-between gap-4 py-2.5
-                                        border-b border-rule last:border-b-0">
-                <dt className="font-display text-base text-ink-soft">{d.title}</dt>
-                <dd className="figure font-display text-lg font-semibold text-ink">
-                  {d.weight}<span className="text-ink-faint text-sm">%</span>
-                </dd>
-              </div>
-            ))}
-          </dl>
-          <p className="font-text text-xs text-ink-faint mt-4 leading-relaxed">
-            Percentages are the proportion of scored questions drawn from each
-            performance domain.
-          </p>
+        <div className="pmp-cloth-stage">
+          <div className="pmp-art-caption">
+            <span>The river remembers every decision.</span>
+            <span>Move through the rain</span>
+          </div>
+          <Droplets
+            className="pmp-droplets"
+            intensity={0.68}
+            speed={0.5}
+            scale={0.72}
+            dropWidth={0.82}
+            dropLength={1.05}
+            refraction={0.24}
+            blur={0.15}
+            fallSpeed={0.58}
+            wiggle={0.48}
+            staticDrops={0.52}
+            interactive
+            interactionRadius={0.2}
+            interactionStrength={0.78}
+            interactionDistortion={2.4}
+            tint={[0.76, 0.86, 0.94]}
+            tintStrength={0.18}
+          >
+            <Cloth
+              className="pmp-cloth"
+              pin="left"
+              wind={1.35}
+              speed={0.38}
+              amplitude={18}
+              drape={28}
+              brush={1.25}
+              brushSize={180}
+              damping={1.3}
+              light={0.62}
+              sheen={0.08}
+              shadow={0.42}
+              cornerRadius={3}
+              perspective={1450}
+            >
+              <img
+                src="/art/pmp-journey.jpg"
+                alt="Three project paths converging at a luminous pavilion"
+                className="pmp-journey-art"
+              />
+            </Cloth>
+            <blockquote className="pmp-wisdom-card">
+              <span>A project meditation</span>
+              <p>Purpose is the riverbed.</p>
+              <small>Plans may bend; value must still arrive.</small>
+            </blockquote>
+          </Droplets>
         </div>
+      </div>
+      <div className="pmp-scroll-mark" aria-hidden="true"><span /> Explore the manual</div>
+    </section>
+
+    <section className="pmp-intro">
+      <div>
+        <span className="numeral text-sm font-semibold">§ 01</span>
+        <p className="label mt-3">The examination landscape</p>
+      </div>
+      <div>
+        <h2>Study the system, not a stack of facts.</h2>
+        <p>
+          The exam rewards judgment: what to do next, whom to involve, and which
+          delivery path fits the work. This manual makes those relationships visible.
+        </p>
       </div>
     </section>
 
-    {/* ------------------------------------------------------------ Contents */}
-    <section className="mt-20 sm:mt-28">
-      <div className="flex items-baseline justify-between gap-6 border-t border-rule-strong pt-4 mb-2">
-        <h2 className="font-display text-2xl font-semibold text-ink">Contents</h2>
-        <span className="label text-ink-faint">Three domains</span>
+    <section className="pmp-domains">
+      <div className="pmp-section-heading">
+        <div>
+          <span className="label">Your learning path</span>
+          <h2>Three domains. One practice.</h2>
+        </div>
+        <p>Follow the exam weight, or begin where your judgment needs the most work.</p>
       </div>
 
-      <ol>
-        {domains.map((d) => (
-          <li key={d.n}>
-            <Link
-              to={d.path}
-              className="group grid grid-cols-1 lg:grid-cols-12 gap-x-10 gap-y-4 items-start
-                         border-b border-rule py-8 sm:py-10 transition-colors
-                         hover:bg-[rgba(255,253,247,0.7)]"
-            >
-              {/* Numeral */}
-              <div className="lg:col-span-1">
-                <span className="numeral text-2xl font-semibold">{d.n}</span>
+      <ol className="pmp-domain-list">
+        {domains.map((domain) => (
+          <li key={domain.n}>
+            <Link to={domain.path} className="pmp-domain-card">
+              <span className="pmp-domain-number">{domain.n}</span>
+              <div className="pmp-domain-copy">
+                <span>{domain.subtitle}</span>
+                <h3>{domain.title}</h3>
+                <p>{domain.gloss}</p>
               </div>
-
-              {/* Title + gloss */}
-              <div className="lg:col-span-6">
-                <h3 className="font-display text-2xl sm:text-[1.75rem] font-semibold text-ink
-                               group-hover:text-lapis transition-colors leading-snug">
-                  {d.title}
-                </h3>
-                <p className="font-display text-ink-muted italic mt-1.5">{d.subtitle}</p>
-                <p className="font-text text-[15px] text-ink-soft leading-relaxed mt-4 measure">
-                  {d.gloss}
-                </p>
+              <figure className={`pmp-domain-visual ${domain.captionPosition === 'top' ? 'pmp-domain-visual-caption-top' : ''}`}>
+                <img
+                  src={domain.image}
+                  alt=""
+                  loading="lazy"
+                  style={{ objectPosition: domain.imagePosition || 'center' }}
+                />
+                <figcaption>
+                  <span>{domain.wisdom}</span>
+                  <small>{domain.lesson}</small>
+                </figcaption>
+              </figure>
+              <div className="pmp-domain-metric">
+                <span>Exam weight</span>
+                <strong>{domain.weight}<small>%</small></strong>
               </div>
-
-              {/* Weight */}
-              <div className="lg:col-span-2 lg:text-right">
-                <span className="label block mb-1">Weight</span>
-                <span className="figure font-display text-4xl font-semibold text-ink leading-none">
-                  {d.weight}
-                  <span className="text-lg text-ink-faint">%</span>
-                </span>
-              </div>
-
-              {/* Progress */}
-              <div className="lg:col-span-3">
-                <div className="flex items-baseline justify-between mb-2">
-                  <span className="label">Studied</span>
-                  <span className="figure font-text text-sm font-semibold text-ink-soft">
-                    {d.progress}%
-                  </span>
-                </div>
-                <div className="h-px w-full bg-rule-strong relative">
-                  <div
-                    className="absolute inset-y-0 left-0 h-px bg-lapis"
-                    style={{ width: `${d.progress}%` }}
-                  />
-                  <div
-                    className="absolute -top-[3px] h-[7px] w-px bg-lapis"
-                    style={{ left: `${d.progress}%` }}
-                  />
-                </div>
-                <span className="hidden lg:flex items-center gap-1.5 label-accent mt-5
-                                 opacity-0 group-hover:opacity-100 transition-opacity">
-                  Read <ArrowRight size={13} strokeWidth={2.2} />
-                </span>
+              <div className="pmp-domain-progress">
+                <div><span>Studied</span><strong>{domain.progress}%</strong></div>
+                <i><b style={{ width: `${domain.progress}%` }} /></i>
+                <span className="pmp-domain-link">Open chapter <ArrowRight size={14} /></span>
               </div>
             </Link>
           </li>
         ))}
       </ol>
     </section>
-  </motion.div>
+  </div>
 );
 
 export default Dashboard;

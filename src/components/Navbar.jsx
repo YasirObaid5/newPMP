@@ -30,7 +30,7 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50">
       {/* Masthead — solid lapis, the colour block that carries the identity */}
-      <div className="bg-lapis text-paper-raised">
+      <div className="pmp-masthead text-paper-raised">
         <div className="max-w-[84rem] mx-auto px-4 sm:px-6 lg:px-10">
           <div className="flex items-center justify-between h-16 lg:h-[4.75rem]">
             <div className="flex items-center gap-3.5">
@@ -43,7 +43,7 @@ const Navbar = () => {
                 </span>
                 <span className="hidden sm:inline font-text text-[10.5px] font-semibold
                                  uppercase tracking-[0.18em] text-paper-raised/60">
-                  A Study Manual
+                  The Way of the Project
                 </span>
               </div>
             </div>
